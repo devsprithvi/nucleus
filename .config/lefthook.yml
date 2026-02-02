@@ -1,0 +1,12 @@
+# .config/lefthook.yml
+
+pre-commit:
+  commands:
+    # 1. Gitleaks (Security)
+    secrets:
+      run: gitleaks detect --config .config/gitleaks.toml --no-git --redact -v
+
+    # 2. Go Lint (Quality)
+    lint:
+      glob: "*.go"
+      run: golangci-lint run ./...

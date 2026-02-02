@@ -1,0 +1,26 @@
+name: auth
+displayName: Authentication
+domain: identity
+version: 0.1.0
+status: development
+
+description: |
+  Authentication module with multiple provider variants.
+  Choose a variant based on your requirements.
+
+# Available variants (each is a separate folder)
+variants:
+  - name: zitadel
+    status: development
+    description: Identity provider with SSO, MFA, and user management
+
+provides:
+  library: false
+  service: true
+
+maintainers:
+  - team: platform
+
+tags:
+  - security
+  - core

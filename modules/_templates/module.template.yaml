@@ -1,0 +1,49 @@
+# Module Metadata Template
+# Copy this file to your module folder and rename to module.yaml
+# Fill in the placeholders and remove comments as needed
+
+name: {module-name}                    # Lowercase, kebab-case
+displayName: {Module Display Name}     # Human-readable name
+domain: {domain}                       # Parent domain (identity, observability, etc.)
+version: 0.1.0                         # Semantic version
+status: development                    # development | alpha | beta | stable | deprecated | archived
+
+description: |
+  {Brief description of what this module does.}
+  {Mention what powers it if applicable.}
+
+# What external tools/services power this module (if any)
+# Remove this section if the module is entirely original code
+poweredBy:
+  - name: {tool-name}
+    type: {tool-type}                  # identity-provider, database, queue, etc.
+    url: {https://tool-website.com}
+    docs: {https://tool-website.com/docs}
+
+# What this module provides
+provides:
+  library: true                        # Does it provide a library?
+  service: false                       # Does it provide a microservice?
+
+# Service configuration (only if provides.service: true)
+# Remove this section if no service is provided
+service:
+  grpc: {service.v1}                   # gRPC service name
+  rest: /api/v1/{service}              # REST base path
+  healthCheck: /health
+
+# Dependencies on OTHER Nucleus modules (not external packages)
+# Remove if no dependencies
+dependencies:
+  - observability/logging
+  - observability/metrics
+
+# Maintainers
+maintainers:
+  - team: {team-name}
+    slack: "#{slack-channel}"
+
+# Tags for categorization
+tags:
+  - {tag1}
+  - {tag2}

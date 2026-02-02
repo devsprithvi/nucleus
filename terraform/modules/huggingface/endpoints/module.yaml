@@ -1,0 +1,25 @@
+# yaml-language-server: $schema=../../_schemas/module.schema.json
+
+name: huggingface-endpoints
+provider: huggingface
+domain: AI/ML
+version: 1.0.0
+type: public
+description: Deploys Hugging Face Inference Endpoints for ML model hosting with auto-scaling support
+
+experimental: true
+
+terraform:
+  required_version: ">= 1.5.0"
+
+providers:
+  huggingface:
+    source: issamemari/huggingface
+    version: "1.5.0"
+
+tags:
+  - ml
+  - inference
+  - huggingface
+  - serverless
+  - ai

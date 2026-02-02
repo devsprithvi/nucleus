@@ -1,0 +1,26 @@
+# yaml-language-server: $schema=../../_schemas/module.schema.json
+
+name: huggingface-spaces
+provider: huggingface
+domain: AI/ML
+version: 1.0.0
+type: public
+description: Deploys Hugging Face Spaces for hosting ML demos, apps, and interactive interfaces
+
+experimental: true
+
+terraform:
+  required_version: ">= 1.5.0"
+
+providers:
+  huggingface-spaces:
+    source: strickvl/huggingface-spaces
+    version: "0.0.4"
+
+tags:
+  - ml
+  - spaces
+  - huggingface
+  - demo
+  - gradio
+  - streamlit

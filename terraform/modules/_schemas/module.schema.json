@@ -1,0 +1,80 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "module.schema.json",
+  "title": "Terraform Module Metadata",
+  "type": "object",
+  "required": ["name", "provider", "domain", "version", "type", "description"],
+  "properties": {
+    "name": {
+      "type": "string",
+      "description": "Module identifier (kebab-case)"
+    },
+    "provider": {
+      "type": "string",
+      "description": "Primary cloud provider"
+    },
+    "domain": {
+      "type": "string",
+      "description": "Service domain (Compute, Storage, Security, AI/ML, Networking)"
+    },
+    "version": {
+      "type": "string",
+      "pattern": "^\\d+\\.\\d+\\.\\d+$",
+      "description": "Semantic version"
+    },
+    "type": {
+      "type": "string",
+      "enum": ["base", "public"],
+      "description": "Module classification"
+    },
+    "description": {
+      "type": "string",
+      "description": "Brief purpose description"
+    },
+    "deprecated": {
+      "type": "boolean",
+      "default": false
+    },
+    "experimental": {
+      "type": "boolean",
+      "default": false
+    },
+    "terraform": {
+      "type": "object",
+      "properties": {
+        "required_version": { "type": "string" }
+      }
+    },
+    "providers": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "properties": {
+          "source": { "type": "string" },
+          "version": { "type": "string" }
+        }
+      }
+    },
+    "depends_on": {
+      "type": "object",
+      "properties": {
+        "internal": { "type": "array", "items": { "type": "string" } },
+        "external": { "type": "array", "items": { "type": "string" } }
+      }
+    },
+    "tags": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "maintainers": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "name": { "type": "string" },
+          "email": { "type": "string", "format": "email" }
+        }
+      }
+    }
+  }
+}
