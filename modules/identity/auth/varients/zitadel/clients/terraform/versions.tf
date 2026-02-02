@@ -4,23 +4,19 @@ terraform {
   # =============================================================================
   # REMOTE BACKEND (Scalr)
   # =============================================================================
-  # IMPORTANT: The remote backend will NOT work with relative local module paths!
+  # State is managed remotely via Scalr. Module sources use Git-based paths.
   # 
-  # Before enabling this backend, you MUST:
-  # 1. Push this repo to Git (GitHub, GitLab, etc.)
-  # 2. Change the module source in main.tf from relative path to git-based:
-  #    
-  #    source = "git::https://github.com/YOUR_ORG/nucleus.git//terraform/modules/huggingface/spaces?ref=main"
-  #
-  # Then uncomment the backend block below.
+  # Version Control:
+  #   - ref=main       → Development (latest, may change)
+  #   - ref=v1.0.0     → Production (stable, versioned)
   # =============================================================================
-  # backend "remote" {
-  #   hostname     = "devsprithvi.scalr.io"
-  #   organization = "env-v0p23p6v5h5ug56ti"
-  #   workspaces {
-  #     name = "zitadel-clients"
-  #   }
-  # }
+  backend "remote" {
+    hostname     = "devsprithvi.scalr.io"
+    organization = "env-v0p23p6v5h5ug56ti"
+    workspaces {
+      name = "zitadel-clients"
+    }
+  }
 
   # Using Terraform registry as OpenTofu registry doesn't have this provider
   required_providers {

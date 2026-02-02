@@ -11,7 +11,9 @@
 # =============================================================================
 
 module "zitadel" {
-  source = "../../../../../../../terraform/modules/huggingface/spaces"
+  # Git-based source for remote backend compatibility
+  # Change ref=main to ref=v1.0.0 (or specific tag) for production stability
+  source = "git::https://github.com/devsprithvi/nucleus.git//terraform/modules/huggingface/spaces?ref=main"
 
   name     = "nucleus-zitadel"
   sdk      = "docker"
