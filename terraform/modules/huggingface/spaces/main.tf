@@ -4,7 +4,6 @@ resource "huggingface-spaces_space" "this" {
   sdk        = var.sdk
   template   = var.template
   hardware   = var.hardware
-  storage    = var.storage
   sleep_time = var.sleep_time
   secrets    = var.secrets
   variables  = var.variables
