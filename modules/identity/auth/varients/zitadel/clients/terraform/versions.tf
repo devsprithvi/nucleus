@@ -27,3 +27,25 @@ terraform {
   }
 }
 
+
+
+
+# =============================================================================
+# PROVIDER CONFIGURATION (Managed by Scalr)
+# =============================================================================
+# The huggingface-spaces provider is configured via Scalr's Provider 
+# Configuration feature. Scalr automatically injects the provider block.
+#
+# Setup in Scalr:
+#   1. Go to Scalr > Account > Provider Configurations
+#   2. Click "+ New Provider Configuration"
+#   3. Select "Custom" (since huggingface-spaces is not a built-in provider)
+#   4. Configure:
+#      - Provider Name: huggingface-spaces
+#      - Add argument: token = <your-huggingface-write-token>
+#   5. Link to workspace or set as environment default
+#
+# To get a HuggingFace token:
+#   - Go to https://huggingface.co/settings/tokens
+#   - Create a new token with "Write" access
+# =============================================================================
