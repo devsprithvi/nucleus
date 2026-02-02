@@ -17,9 +17,9 @@ module "zitadel" {
 
   name     = "nucleus-zitadel"
   sdk      = "docker"
-  private  = false         # Set to true if you want private access
-  hardware = "cpu-upgrade" # Need more resources for PostgreSQL + Zitadel
-  storage  = "small"       # Persistent storage for database
+  private  = false       # Set to true if you want private access
+  hardware = "cpu-basic" # Free tier (cpu-upgrade requires paid plan)
+  storage  = "small"     # Persistent storage for database
 
   # Environment variables override Zitadel config
   variables = {
