@@ -15,11 +15,11 @@ module "zitadel" {
   # Change ref=main to ref=v1.0.0 (or specific tag) for production stability
   source = "git::https://github.com/devsprithvi/nucleus.git//terraform/modules/huggingface/spaces?ref=main"
 
-  name     = "nucleus-zitadel-dev"
+  name     = "nucleus-zitadel"
   sdk      = "docker"
   private  = false       # Set to true if you want private access
   hardware = "cpu-basic" # Free tier (cpu-upgrade requires paid plan)
-  # storage  = "small"   # REMOVED: Requires paid plan, causes 400 error on free tier
+  storage  = "small"     # Persistent storage for database
 
   # Environment variables override Zitadel config
   variables = {
