@@ -1,0 +1,61 @@
+Running apply in the remote backend. Output will stream here. Pressing Ctrl-C
+will cancel the remote apply if it's still pending. If the apply started it
+will stop streaming the logs, but will not stop the apply running remotely.
+
+Preparing the remote apply...
+
+To view this run in a browser, visit:
+https://devsprithvi.scalr.io/app/env-v0p23p6v5h5ug56ti/zitadel-clients/runs/run-v0p4tv4mru3irbr4m
+
+Waiting for the plan to start...
+
+OpenTofu v1.11.4
+Initializing OpenTofu configuration...
+Configuring remote state backend...
+Initializing plugins and modules...
+
+------------------------------------------------------------------------
+
+
+OpenTofu used the selected providers to generate the following execution
+plan. Resource actions are indicated with the following symbols:
+  + create
+
+OpenTofu will perform the following actions:
+
+  # module.zitadel.huggingface-spaces_space.this will be created
+  + resource "huggingface-spaces_space" "this" {
+      + hardware   = "cpu-basic"
+      + id         = (known after apply)
+      + name       = "nucleus-zitadel-dev"
+      + private    = false
+      + sdk        = "docker"
+      + secrets    = (sensitive value)
+      + sleep_time = 3600
+      + storage    = (known after apply)
+      + template   = (known after apply)
+      + variables  = {
+          + "ZITADEL_EXTERNALDOMAIN" = "nucleus-zitadel.hf.space"
+          + "ZITADEL_EXTERNALPORT"   = "443"
+          + "ZITADEL_EXTERNALSECURE" = "true"
+        }
+    }
+
+Plan: 1 to add, 0 to change, 0 to destroy.
+
+Changes to Outputs:
+  + space_id  = (known after apply)
+  + space_url = (known after apply)
+
+module.zitadel.huggingface-spaces_space.this: Creating...
+Γò╖
+Γöé Error: API Error
+Γöé 
+Γöé   with module.zitadel.huggingface-spaces_space.this,
+Γöé   on .terraform/modules/zitadel/terraform/modules/huggingface/spaces/main.tf line 1, in resource "huggingface-spaces_space" "this":
+Γöé    1: resource "huggingface-spaces_space" "this" {
+Γöé 
+Γöé Unable to create space, got status code: 400
+Γò╡
+
+Error: Failed to perform terraform apply. Unexpected exit code: 1

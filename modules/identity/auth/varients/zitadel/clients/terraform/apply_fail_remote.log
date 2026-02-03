@@ -1,0 +1,34 @@
+Running apply in the remote backend. Output will stream here. Pressing Ctrl-C
+will cancel the remote apply if it's still pending. If the apply started it
+will stop streaming the logs, but will not stop the apply running remotely.
+
+Preparing the remote apply...
+
+To view this run in a browser, visit:
+https://devsprithvi.scalr.io/app/env-v0p23p6v5h5ug56ti/zitadel-clients/runs/run-v0p4tv9earke7hcv1
+
+Waiting for the plan to start...
+
+OpenTofu v1.11.4
+Initializing OpenTofu configuration...
+Configuring remote state backend...
+Initializing plugins and modules...
+
+Error: Failed terraform init (exit 1).
+
+Output:
+Γò╖
+Γöé Error: Unreadable module directory
+Γöé 
+Γöé Unable to evaluate directory symlink: lstat ../../../../../../../terraform:
+Γöé no such file or directory
+Γò╡
+
+Γò╖
+Γöé Error: Unreadable module directory
+Γöé 
+Γöé The directory  could not be read for module "zitadel" at main.tf:13.
+Γò╡
+
+
+

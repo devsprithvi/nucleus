@@ -1,0 +1,46 @@
+2026-02-03T03:09:22.263+0530 [INFO]  OpenTofu version: 1.11.4
+2026-02-03T03:09:22.264+0530 [DEBUG] using github.com/hashicorp/go-tfe v1.95.0
+2026-02-03T03:09:22.264+0530 [DEBUG] using github.com/opentofu/hcl/v2 v2.20.2-0.20251021132045-587d123c2828
+2026-02-03T03:09:22.264+0530 [DEBUG] using github.com/zclconf/go-cty v1.17.0
+2026-02-03T03:09:22.264+0530 [INFO]  Go runtime version: go1.25.6
+2026-02-03T03:09:22.264+0530 [INFO]  CLI args: []string{"C:\\Users\\conne\\AppData\\Local\\Microsoft\\WinGet\\Packages\\OpenTofu.Tofu_Microsoft.Winget.Source_8wekyb3d8bbwe\\tofu.exe", "init"}
+2026-02-03T03:09:22.269+0530 [DEBUG] Attempting to open CLI config file: C:\Users\conne\AppData\Roaming\tofu.rc
+2026-02-03T03:09:22.269+0530 [DEBUG] File doesn't exist, but doesn't need to. Ignoring.
+2026-02-03T03:09:22.269+0530 [INFO]  Loading CLI configuration from C:\Users\conne\AppData\Roaming\terraform.d\credentials.tfrc.json
+2026-02-03T03:09:22.269+0530 [DEBUG] ignoring non-existing provider search directory C:\Projects\Nucleus\nucleus\modules\identity\auth\varients\zitadel\clients\terraform\terraform.d\plugins
+2026-02-03T03:09:22.269+0530 [DEBUG] ignoring non-existing provider search directory C:\Users\conne\AppData\Roaming\terraform.d\plugins
+2026-02-03T03:09:22.272+0530 [DEBUG] ignoring non-existing provider search directory C:\Users\conne\AppData\Roaming\HashiCorp\Terraform\plugins
+2026-02-03T03:09:22.273+0530 [DEBUG] Found the config directory: C:\Users\conne\AppData\Roaming\terraform.d
+2026-02-03T03:09:22.273+0530 [INFO]  CLI command args: []string{"init"}
+
+[0m[1mInitializing the backend...[0m
+2026-02-03T03:09:24.485+0530 [DEBUG] checking for provisioner in "."
+2026-02-03T03:09:24.485+0530 [DEBUG] checking for provisioner in "C:\\Users\\conne\\AppData\\Local\\Microsoft\\WinGet\\Packages\\OpenTofu.Tofu_Microsoft.Winget.Source_8wekyb3d8bbwe"
+[0m[1mInitializing modules...[0m
+2026-02-03T03:09:25.198+0530 [DEBUG] Module installer: begin zitadel
+Downloading git::https://github.com/devsprithvi/nucleus.git?ref=main for zitadel...
+Γò╖
+Γöé Error: Failed to download module
+Γöé 
+Γöé   on main.tf line 13:
+Γöé   13: module "zitadel" {
+Γöé 
+Γöé Could not download module "zitadel" (main.tf:13) source code from
+Γöé "git::https://github.com/devsprithvi/nucleus.git?ref=main": error
+Γöé downloading 'https://github.com/devsprithvi/nucleus.git?ref=main':
+Γöé C:\Program Files\Git\cmd\git.exe exited with 128: Cloning into
+Γöé '.terraform\modules\zitadel'...
+Γöé error: unable to create file
+Γöé terraform/modules/huggingface/endpoints/.terraform/providers/registry.terraform.io/issamemari/huggingface/1.5.0/windows_amd64/terraform-provider-huggingface_v1.5.0.exe:
+Γöé Filename too long
+Γöé error: unable to create file
+Γöé terraform/modules/huggingface/spaces/.terraform/providers/registry.terraform.io/strickvl/huggingface-spaces/0.0.4/windows_amd64/terraform-provider-huggingface-spaces_v0.0.4.exe:
+Γöé Filename too long
+Γöé fatal: unable to checkout working tree
+Γöé warning: Clone succeeded, but checkout failed.
+Γöé You can inspect what was checked out with 'git status'
+Γöé and retry with 'git restore --source=HEAD :/'
+Γöé 
+Γöé 
+Γò╡
+
