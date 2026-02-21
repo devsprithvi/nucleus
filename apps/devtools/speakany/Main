@@ -1,0 +1,21 @@
+package org.devsprithvi.speakany
+
+import jakarta.ws.rs.GET
+import jakarta.ws.rs.Path
+import jakarta.ws.rs.Produces
+import jakarta.ws.rs.core.MediaType
+
+// 1. @Path defines the URL endpoint
+@Path("/test")
+class TestResource {
+
+  // 2. @GET means this triggers on a browser visit
+  @GET
+  @Produces(MediaType.TEXT_PLAIN)
+  fun hello(): String {
+    // 3. This is pure Kotlin
+    val message = "SpeakAny is Breathing!"
+    println("Console Log: Triggered by user")
+    return message
+  }
+}

@@ -1,0 +1,135 @@
+# https://taskfile.dev/api/
+
+version: '3'
+
+# ==============================================================================
+# GLOBAL VARIABLES & ENVIRONMENT
+# ==============================================================================
+# defined here to ensure consistency across all tasks (local & CI/CD)
+vars:
+  # The "Orchestrator" needs to know where the tools live
+  CONFIG_DIR: './config'
+  TOOLS_DIR: './tools'
+  TOOLS_GO_DIR: './.tools'  # Go-managed tools (go.mod with tool/run deps)
+  # Define your primary language paths
+  JS_WORKSPACE: '.' # Root is Bun workspace
+  GO_WORKSPACE: '.' # Root is Go workspace
+
+env:
+  # Force color output in CI/CD environments (GitHub Actions, GitLab CI)
+  FORCE_COLOR: '1'
+
+# ==============================================================================
+# INCLUDES (SCALABILITY)
+# ==============================================================================
+# As your repo grows, don't bloat this file. Split tasks into dedicated files.
+# includes:
+#   docker: ./tools/docker/Taskfile.yml
+#   k8s: ./tools/k8s/Taskfile.yml
+
+# ==============================================================================
+# TASKS (THE COMMANDS)
+# ==============================================================================
+tasks:
+
+  default:
+    desc: 'Lists all available tasks'
+    cmds:
+      - task --list
+
+  # ----------------------------------------------------------------------------
+  # SETUP & INITIALIZATION
+  # ----------------------------------------------------------------------------
+  init:
+    desc: 'Install all dependencies and setup hooks (Run this after git clone)'
+    cmds:
+      - task: deps
+      - task: hooks
+    silent: true # Reduces noise in the terminal
+
+  deps:
+    desc: 'Install dependencies for BOTH languages (Bun & Go)'
+    cmds:
+      - echo "📦 Installing Bun dependencies..."
+      - bun install
+      - echo "📦 Downloading Go modules..."
+      - go mod download
+    sources:
+      - package.json
+      - bun.lockb
+      - go.work
+      - go.mod
+    # Generates a checksum. If files haven't changed, Task skips this! (Huge speedup)
+    generates:
+      - node_modules/.package-lock.json
+
+  hooks:
+    desc: 'Setup Lefthook (Git Hooks) from the tools directory'
+    # This points explicitly to your custom config location
+    cmds:
+      - echo "🪝 Configuring Git Hooks..."
+      - lefthook install -f {{.TOOLS_DIR}}/lefthook.yml
+
+  # ----------------------------------------------------------------------------
+  # QUALITY CONTROL (LINTING & FORMATTING)
+  # ----------------------------------------------------------------------------
+  lint:
+    desc: 'Run Linters for complete repository (Oxlint + GolangCI + Hadolint)'
+    cmds:
+      # Run in parallel because they don't depend on each other. Fast!
+      - defer: { task: lint:js }
+      - defer: { task: lint:go }
+      - defer: { task: lint:docker }
+    
+  lint:js:
+    internal: true # Not listed in 'task --list', helper only
+    cmds:
+      # Points to the config file inside your CONFIG_DIR
+      - oxlint --config {{.CONFIG_DIR}}/oxlint.json
+
+  lint:go:
+    internal: true
+    cmds:
+      # Assumes you have a golangci-lint config in your config folder
+      - golangci-lint run --config {{.CONFIG_DIR}}/.golangci.yml
+
+  lint:docker:
+    internal: true
+    desc: 'Lint all Dockerfiles using Hadolint (via Go)'
+    vars:
+      HADOLINT_CONFIG: '{{.TOOLS_GO_DIR}}/config/hadolint.yaml'
+    cmds:
+      - echo "🐳 Linting Dockerfiles..."
+      # Task uses mvdan.cc/sh (POSIX shell in Go) — works cross-platform.
+      # go-hadolint only accesses files relative to cwd, so we run from root.
+      - go run github.com/wasilibs/go-hadolint/cmd/hadolint --config {{.HADOLINT_CONFIG}} {{.CLI_ARGS | default "apps/artifacts/sonatype_nexus/Dockerfile"}}
+
+  # ----------------------------------------------------------------------------
+  # BUILD & RUN
+  # ----------------------------------------------------------------------------
+  build:
+    desc: 'Build all artifacts for production'
+    deps: [deps] # Ensure deps are installed first
+    cmds:
+      - echo "🏗️ Building Nucleus..."
+      - task: build:js
+      - task: build:go
+
+  build:js:
+    internal: true
+    cmds:
+      - bun run build
+
+  build:go:
+    internal: true
+    cmds:
+      - go build -o bin/server ./cmd/server
+
+  # ----------------------------------------------------------------------------
+  # UTILITIES
+  # ----------------------------------------------------------------------------
+  clean:
+    desc: 'Clean up build artifacts and caches'
+    cmds:
+      - rm -rf dist/ bin/ node_modules/
+      - go clean -modcache

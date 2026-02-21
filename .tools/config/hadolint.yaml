@@ -1,0 +1,60 @@
+# =============================================================================
+# HADOLINT — Dockerfile Linter Configuration
+# =============================================================================
+# Docs: https://github.com/hadolint/hadolint#configure
+# Rules: https://github.com/hadolint/hadolint#rules
+#
+# This config is invoked via Taskfile:
+#   task lint:docker
+#
+# It uses the Go distribution (wasilibs/go-hadolint) so no binary install needed.
+# =============================================================================
+
+# Fail on warnings and above (error | warning | info | style | ignore)
+failure-threshold: warning
+
+# Output format (tty | json | checkstyle | codeclimate | gitlab_codeclimate | gnu | codacy | sonarqube | sarif)
+format: tty
+
+# -----------------------------------------------------------------------------
+# IGNORED RULES
+# -----------------------------------------------------------------------------
+# Add rules here that are intentionally skipped for your project.
+# Each rule has a rationale comment so future maintainers understand WHY.
+# ignored:
+#   # DL3007: Using latest is avoid for reproducibility, but acceptable for
+#   #         base images that are intentionally pinned externally (e.g., Nexus).
+#   #         Remove this if you want strict tag pinning enforced.
+#   - DL3007
+
+# -----------------------------------------------------------------------------
+# RULE SEVERITY OVERRIDES
+# -----------------------------------------------------------------------------
+# Promote or demote specific rules to match your project's standards.
+override:
+  warning:
+    # DL3008: Pin versions in apt-get install (important for reproducibility)
+    - DL3008
+    # DL3009: Delete apt lists after install (reduces image size)
+    - DL3009
+  info:
+    # DL3059: Multiple consecutive RUN instructions (style preference)
+    - DL3059
+
+# -----------------------------------------------------------------------------
+# TRUSTED REGISTRIES
+# -----------------------------------------------------------------------------
+# Only allow base images from these registries. Uncomment and customize.
+# trustedRegistries:
+#   - docker.io
+#   - gcr.io
+#   - ghcr.io
+
+# -----------------------------------------------------------------------------
+# LABEL SCHEMA (Optional)
+# -----------------------------------------------------------------------------
+# Enforce required labels on all images. Uncomment to enable.
+# label-schema:
+#   maintainer: text
+#   org.opencontainers.image.source: url
+#   org.opencontainers.image.description: text

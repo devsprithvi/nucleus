@@ -1,0 +1,46 @@
+version: "3.8"
+
+services:
+  statping:
+    # 1. Image: This is the correct, maintained community fork.
+    image: adamboutcher/statping-ng:latest
+    container_name: statping
+    hostname: statping
+
+    # 2. Restart: "always" ensures it comes back after a server reboot.
+    restart: always
+
+    # 3. Ports: Maps external port 8081 to internal 8080.
+    # Access via http://your-ip:8081
+    ports:
+      - "8081:8080"
+
+    # 4. Volumes: Persists your data so you don't lose it on restart.
+    volumes:
+      - statping_data:/app
+
+    # 5. Environment: CRITICAL settings for your 1GB server.
+    environment:
+      - DB_CONN=sqlite           # Forces lightweight file database (Saves RAM)
+      - NAME=My Status Page      # Sets the title immediately
+      - DESCRIPTION=System Status
+      - DISABLE_LOGS=false       # Keeps logs enabled but manageable
+      - TZ=Asia/Kolkata          # Sets Timezone to India (IST) for accurate logs
+
+    # 6. Logging: Prevents logs from filling up your hard drive.
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+    # 7. Resources (Optional): Failsafe to stop it from crashing your server.
+    # This limits the container to 256MB RAM.
+    deploy:
+      resources:
+        limits:
+          memory: 256M
+
+volumes:
+  statping_data:
+    driver: local

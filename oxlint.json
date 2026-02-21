@@ -1,0 +1,8 @@
+{
+  "rules": {
+    "correctness": "warn",
+    "perf": "warn",
+    "style": "allow" 
+  },
+  "ignorePatterns": ["node_modules", "dist"]
+}

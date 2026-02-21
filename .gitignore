@@ -12,7 +12,7 @@
 crash.log
 crash.*.log
 
-# Lock files (optional - some prefer to commit these)
+# Lock files (committed for reproducibility - uncomment to ignore)
 # .terraform.lock.hcl
 
 # Override files
@@ -34,8 +34,67 @@ terraform.rc
 *.tfplan
 plan_output.txt
 
+# Terraform operation logs
+apply_log.txt
+apply_*.log
+init_log.txt
+
 # Tofu init logs
 tofu_init_log.txt
+
+# =============================================================================
+# Node / JavaScript / TypeScript
+# =============================================================================
+node_modules/
+**/node_modules/
+
+# Build outputs
+dist/
+build/
+out/
+.next/
+.nuxt/
+
+# Package manager artifacts
+.pnp
+.pnp.js
+.yarn/cache
+.yarn/unplugged
+.yarn/build-state.yml
+.yarn/install-state.gz
+
+# Lock files (keep bun.lock committed for reproducibility)
+# bun.lock
+# package-lock.json
+# yarn.lock
+
+# =============================================================================
+# Go
+# =============================================================================
+# Binaries
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+
+# Vendor directories
+vendor/
+
+# Test binary output (from go test -c)
+*.test
+
+# Coverage output
+*.out
+
+# Dependency management
+go.work.sum
+
+# =============================================================================
+# Nx
+# =============================================================================
+.nx/cache/
+.nx/workspace-data/
 
 # =============================================================================
 # IDE / Editor
@@ -45,9 +104,60 @@ tofu_init_log.txt
 *.swp
 *.swo
 *~
+*.sublime-workspace
+*.sublime-project
+.project
+.classpath
+.settings/
+
+# JetBrains
+*.iml
+*.ipr
+*.iws
 
 # =============================================================================
 # OS
 # =============================================================================
 .DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
 Thumbs.db
+desktop.ini
+
+# =============================================================================
+# Docker
+# =============================================================================
+.docker/
+
+# =============================================================================
+# Secrets / Environment
+# =============================================================================
+.env
+.env.*
+!.env.example
+!.env.template
+*.pem
+*.key
+*.cert
+*.p12
+
+# =============================================================================
+# Temp / Generated
+# =============================================================================
+# Ignore everything in temp/ except the .gitkeep placeholder
+temp/*
+!temp/.gitkeep
+
+# Dagger generated files
+/dagger.gen.go
+**/internal/dagger/
+**/internal/querybuilder/
+**/internal/telemetry/
+
+# =============================================================================
+# Pulumi
+# =============================================================================
+.pulumi/
