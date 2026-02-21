@@ -245,10 +245,6 @@
                 },
                 "type": "array"
               },
-              "properties": {
-                "type": "object",
-                "x-kubernetes-preserve-unknown-fields": true
-              },
               "scopes": {
                 "additionalProperties": {
                   "type": "string"
@@ -929,10 +925,6 @@
                   ],
                   "description": "ApplicationTrait defines the trait of application",
                   "properties": {
-                    "properties": {
-                      "type": "object",
-                      "x-kubernetes-preserve-unknown-fields": true
-                    },
                     "type": {
                       "enum": [
                         "affinity",
@@ -1204,10 +1196,6 @@
               "name": {
                 "description": "Name is the unique name of the policy.",
                 "type": "string"
-              },
-              "properties": {
-                "type": "object",
-                "x-kubernetes-preserve-unknown-fields": true
               },
               "type": {
                 "description": "Type is the type of the policy",
@@ -1972,11 +1960,6 @@
                       "type": "object"
                     },
                     "type": "array"
-                  },
-                  "properties": {
-                    "description": "Properties is the properties of the step",
-                    "type": "object",
-                    "x-kubernetes-preserve-unknown-fields": true
                   },
                   "subSteps": {
                     "items": {
