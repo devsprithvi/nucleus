@@ -169,6 +169,12 @@ jobs:
             CHANGED=$(git diff --cached --name-only | wc -l)
             TIMESTAMP=$(date -u '+%Y-%m-%dT%H:%M:%SZ')
             git commit -m "ci: regenerate KubeVela schemas [${TIMESTAMP}] (${CHANGED} files)"
+
+            # Pull any commits that landed on main while this workflow was running,
+            # then replay our schema commit on top. Handles the race condition where
+            # we push debugging fixes while the runner is mid-flight.
+            git pull --rebase origin main
+
             git push
             echo "🚀 Pushed ${CHANGED} schema file(s)."
           fi
