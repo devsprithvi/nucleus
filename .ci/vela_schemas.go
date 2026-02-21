@@ -26,15 +26,13 @@ type SchemaMapItem struct {
 // ClusterPayload is what executeVPNAndFetch returns — both pieces of cluster data
 // in a single round-trip so we only need to connect once.
 type ClusterPayload struct {
-	// CRDSchema is the raw OpenAPI v3 JSON from the Application CRD.
-	// It already defines every outer field: components[].name, type, traits,
-	// dependsOn, policies, workflow — nothing needs to be written manually.
-	CRDSchema string `json:"crd_schema"`
+	// CRDSchema is the raw OpenAPI v3 JSON object from the Application CRD.
+	// Stored as json.RawMessage because bash inlines it as a JSON object (not a string).
+	CRDSchema json.RawMessage `json:"crd_schema"`
 
-	// ConfigMaps is the raw JSON list of per-type property schemas stored
-	// in vela-system ConfigMaps. These fill in the 'properties:' detail
-	// for each component/trait/policy/workflowstep type.
-	ConfigMaps string `json:"config_maps"`
+	// ConfigMaps is the raw JSON list object of per-type property schemas.
+	// Stored as json.RawMessage for the same reason.
+	ConfigMaps json.RawMessage `json:"config_maps"`
 }
 
 // GenerateVelaSchemas fetches both the Application CRD schema (outer structure)
@@ -61,8 +59,9 @@ func (a *Actions) GenerateVelaSchemas(
 	}
 
 	// Phase 3: Parse the ConfigMap list for per-type property schemas
+	// payload.ConfigMaps is json.RawMessage ([]byte) — pass directly, no conversion needed
 	var cmList SchemaMapList
-	if err := json.Unmarshal([]byte(payload.ConfigMaps), &cmList); err != nil {
+	if err := json.Unmarshal(payload.ConfigMaps, &cmList); err != nil {
 		return nil, fmt.Errorf("phase 3 (parse configmaps) failed: %w", err)
 	}
 	if len(cmList.Items) == 0 {
@@ -75,7 +74,7 @@ func (a *Actions) GenerateVelaSchemas(
 	schemaDir, entries = writeIndividualSchemas(schemaDir, cmList)
 
 	// Phase 5: Build master schema using CRD as base, inject per-type property schemas
-	schemaDir, err = buildMasterSchema(schemaDir, payload.CRDSchema, entries)
+	schemaDir, err = buildMasterSchema(schemaDir, []byte(payload.CRDSchema), entries)
 	if err != nil {
 		return nil, fmt.Errorf("phase 5 (build master schema) failed: %w", err)
 	}
@@ -351,10 +350,10 @@ func buildConditionals(entries []schemaEntry) []map[string]interface{} {
 //     b. allOf if/then rules that point 'properties' to the right schema file
 //  3. Repeat (2b) for traits[].type → trait schemas
 //  4. Do the same for spec.policies.items and spec.workflow.steps.items
-func buildMasterSchema(dir *dagger.Directory, crdJSON string, entries []schemaEntry) (*dagger.Directory, error) {
+func buildMasterSchema(dir *dagger.Directory, crdJSON []byte, entries []schemaEntry) (*dagger.Directory, error) {
 	// Parse the CRD schema as a generic map — we don't need typed structs
 	var schema map[string]interface{}
-	if err := json.Unmarshal([]byte(crdJSON), &schema); err != nil {
+	if err := json.Unmarshal(crdJSON, &schema); err != nil {
 		return nil, fmt.Errorf("parse CRD schema: %w", err)
 	}
 
