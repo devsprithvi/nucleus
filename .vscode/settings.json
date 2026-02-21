@@ -63,23 +63,25 @@
   // ==========================================================================
   // KUBEVELA AUTO-COMPLETION
   // ==========================================================================
-  // Maps the locally generated KubeVela master schema to every app.yaml file
+  // Maps the generated KubeVela master schema to every app.yaml / *.vela.yaml
   // under the apps/ directory. This gives you:
-  //   ✅ Auto-complete on 'type:' (webservice, worker, statefulset, ...)
-  //   ✅ Property suggestions under 'properties:' per component type
-  //   ✅ Validation squiggles for wrong field names
-  //   ✅ Hover documentation from the schema
+  //   ✅ Ctrl+Space auto-complete on 'type:' → webservice, worker, statefulset...
+  //   ✅ Property hints under 'properties:' scoped to the chosen component type
+  //   ✅ Red squiggles for invalid field names
+  //   ✅ Hover documentation from the schema — fully OFFLINE, no cluster needed
   //
-  // The schema is generated from your live cluster by running:
+  // NOTE on 'kind:' — KubeVela apps always use kind: Application.
+  //   Other OAM kinds (ComponentDefinition, TraitDefinition, WorkflowStep...)
+  //   are written by platform operators, not app developers. For those files,
+  //   use the kubernetes schema extension (ms-kubernetes-tools.vscode-kubernetes-tools).
+  //
+  // Regenerate schemas anytime:
   //   GitHub Actions → "Generate KubeVela Schemas" → Run workflow
   //
-  // The key is the schema file path (relative to workspace root).
-  // The value is a glob that controls which files this schema applies to.
+  // yaml.schemas values MUST be a string (VS Code validator does not accept arrays).
+  // Use a broad glob — all *.yaml under apps/ are KubeVela Application files.
   "yaml.schemas": {
-    "./schemas/kubevela/vela-application-schema.json": [
-      "apps/**/app.yaml",
-      "apps/**/*.vela.yaml"
-    ]
+    "./schemas/kubevela/vela-application-schema.json": "apps/**/*.yaml"
   },
 
   /* * =========================================================================
