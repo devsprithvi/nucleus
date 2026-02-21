@@ -1,53 +1,22 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "description": "Defines a KubeVela Application resource (OAM Application). Schemas generated from live cluster.",
+  "description": "Application is the Schema for the applications API",
   "properties": {
     "apiVersion": {
-      "const": "core.oam.dev/v1beta1",
-      "description": "Must be 'core.oam.dev/v1beta1'.",
+      "description": "APIVersion defines the versioned schema of this representation of an object.\nServers should convert recognized schemas to the latest internal value, and\nmay reject unrecognized values.\nMore info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
       "type": "string"
     },
     "kind": {
-      "const": "Application",
-      "description": "Must be 'Application'. Other OAM kinds (ComponentDefinition, TraitDefinition) are for platform operators.",
+      "description": "Kind is a string value representing the REST resource this object represents.\nServers may infer this from the endpoint the client submits requests to.\nCannot be updated.\nIn CamelCase.\nMore info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
       "type": "string"
     },
     "metadata": {
-      "description": "Standard Kubernetes object metadata.",
-      "properties": {
-        "annotations": {
-          "additionalProperties": {
-            "type": "string"
-          },
-          "description": "Key-value annotations attached to this Application resource.",
-          "type": "object"
-        },
-        "labels": {
-          "additionalProperties": {
-            "type": "string"
-          },
-          "description": "Key-value labels attached to this Application resource.",
-          "type": "object"
-        },
-        "name": {
-          "description": "The application name. Used as the Kubernetes resource name.",
-          "type": "string"
-        },
-        "namespace": {
-          "description": "Kubernetes namespace to deploy into. Defaults to the cluster default.",
-          "type": "string"
-        }
-      },
-      "required": [
-        "name"
-      ],
       "type": "object"
     },
     "spec": {
-      "description": "The desired state of the Application.",
+      "description": "ApplicationSpec is the spec of Application",
       "properties": {
         "components": {
-          "description": "The list of workload components that make up this application.",
           "items": {
             "allOf": [
               {
@@ -222,29 +191,74 @@
                 }
               }
             ],
-            "description": "A single workload component of the application.",
+            "description": "ApplicationComponent describe the component of application",
             "properties": {
               "dependsOn": {
-                "description": "Names of other components in the same application that must be deployed first.",
                 "items": {
                   "type": "string"
                 },
                 "type": "array"
               },
               "externalRevision": {
-                "description": "Pin to a specific component revision by name.",
+                "description": "ExternalRevision specified the component revisionName",
                 "type": "string"
+              },
+              "inputs": {
+                "description": "StepInputs defines variable input of WorkflowStep",
+                "items": {
+                  "description": "InputItem defines an input variable of WorkflowStep",
+                  "properties": {
+                    "from": {
+                      "type": "string"
+                    },
+                    "parameterKey": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "from"
+                  ],
+                  "type": "object"
+                },
+                "type": "array"
               },
               "name": {
-                "description": "A unique name for this component instance within the application.",
                 "type": "string"
               },
+              "outputs": {
+                "description": "StepOutputs defines output variable of WorkflowStep",
+                "items": {
+                  "description": "OutputItem defines an output variable of WorkflowStep",
+                  "properties": {
+                    "name": {
+                      "type": "string"
+                    },
+                    "valueFrom": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "name",
+                    "valueFrom"
+                  ],
+                  "type": "object"
+                },
+                "type": "array"
+              },
               "properties": {
-                "description": "Component-specific properties. Set 'type' first, then Ctrl+Space here for field hints.",
-                "type": "object"
+                "type": "object",
+                "x-kubernetes-preserve-unknown-fields": true
+              },
+              "scopes": {
+                "additionalProperties": {
+                  "type": "string"
+                },
+                "description": "scopes in ApplicationComponent defines the component-level scopes\nthe format is \u003cscope-type:scope-instance-name\u003e pairs, the key represents type of `ScopeDefinition` while the value represent the name of scope instance.",
+                "type": "object",
+                "x-kubernetes-preserve-unknown-fields": true
               },
               "traits": {
-                "description": "Operational traits to attach to this component (ingress, scaler, resource limits, etc.).",
+                "description": "Traits define the trait of one component, the type must be array to keep the order.",
                 "items": {
                   "allOf": [
                     {
@@ -913,14 +927,13 @@
                       }
                     }
                   ],
-                  "description": "An operational capability attached to a component (e.g. ingress, scaler, resource limits).",
+                  "description": "ApplicationTrait defines the trait of application",
                   "properties": {
                     "properties": {
-                      "description": "Trait-specific properties. Set 'type' first, then use Ctrl+Space here.",
-                      "type": "object"
+                      "type": "object",
+                      "x-kubernetes-preserve-unknown-fields": true
                     },
                     "type": {
-                      "description": "The trait definition type. Controls which 'properties' are valid.",
                       "enum": [
                         "affinity",
                         "annotations",
@@ -969,7 +982,6 @@
                 "type": "array"
               },
               "type": {
-                "description": "The component definition type. Controls which 'properties' are valid. Use Ctrl+Space to see all options.",
                 "enum": [
                   "cron-task",
                   "daemon",
@@ -993,7 +1005,7 @@
           "type": "array"
         },
         "policies": {
-          "description": "Application-level policies such as topology, override, garbage-collect.",
+          "description": "Policies defines the global policies for all components in the app, e.g. security, metrics, gitops,\nmulti-cluster placement rules, etc.\nPolicies are applied after components are rendered and before workflow steps are executed.",
           "items": {
             "allOf": [
               {
@@ -1187,18 +1199,18 @@
                 }
               }
             ],
-            "description": "An application-level policy (e.g. override, topology, garbage-collect).",
+            "description": "AppPolicy defines a global policy for all components in the app.",
             "properties": {
               "name": {
-                "description": "A unique name for this policy.",
+                "description": "Name is the unique name of the policy.",
                 "type": "string"
               },
               "properties": {
-                "description": "Policy-specific properties. Set 'type' first, then Ctrl+Space here.",
-                "type": "object"
+                "type": "object",
+                "x-kubernetes-preserve-unknown-fields": true
               },
               "type": {
-                "description": "The policy type. Controls which 'properties' are valid.",
+                "description": "Type is the type of the policy",
                 "enum": [
                   "apply-once",
                   "envbinding",
@@ -1215,7 +1227,6 @@
               }
             },
             "required": [
-              "name",
               "type"
             ],
             "type": "object"
@@ -1223,32 +1234,26 @@
           "type": "array"
         },
         "workflow": {
-          "description": "Custom deployment workflow. If omitted, KubeVela deploys all components in parallel.",
+          "description": "Workflow defines how to customize the control logic.\nIf workflow is specified, Vela won't apply any resource, but provide rendered output in AppRevision.\nWorkflow steps are executed in array order, and each step:\n- will have a context in annotation.\n- should mark \"finish\" phase in status.conditions.",
           "properties": {
             "mode": {
-              "description": "Execution mode for the workflow steps.",
+              "description": "WorkflowExecuteMode defines the mode of workflow execution",
               "properties": {
                 "steps": {
-                  "description": "Top-level step execution order. DAG = parallel where possible, StepByStep = sequential.",
-                  "enum": [
-                    "DAG",
-                    "StepByStep"
-                  ],
+                  "description": "Steps is the mode of workflow steps execution",
                   "type": "string"
                 },
                 "subSteps": {
-                  "description": "Execution order for steps inside a step-group.",
-                  "enum": [
-                    "DAG",
-                    "StepByStep"
-                  ],
+                  "description": "SubSteps is the mode of workflow sub steps execution",
                   "type": "string"
                 }
               },
               "type": "object"
             },
+            "ref": {
+              "type": "string"
+            },
             "steps": {
-              "description": "Ordered list of workflow steps.",
               "items": {
                 "allOf": [
                   {
@@ -1898,38 +1903,175 @@
                     }
                   }
                 ],
-                "description": "A single step in the application deployment workflow.",
+                "description": "WorkflowStep defines how to execute a workflow step.",
                 "properties": {
                   "dependsOn": {
+                    "description": "DependsOn is the dependency of the step",
                     "items": {
                       "type": "string"
                     },
                     "type": "array"
                   },
                   "if": {
-                    "description": "A CUE expression. If false, this step is skipped.",
+                    "description": "If is the if condition of the step",
                     "type": "string"
                   },
                   "inputs": {
+                    "description": "Inputs is the inputs of the step",
+                    "items": {
+                      "description": "InputItem defines an input variable of WorkflowStep",
+                      "properties": {
+                        "from": {
+                          "type": "string"
+                        },
+                        "parameterKey": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "from"
+                      ],
+                      "type": "object"
+                    },
                     "type": "array"
                   },
+                  "meta": {
+                    "description": "Meta is the meta data of the workflow step.",
+                    "properties": {
+                      "alias": {
+                        "type": "string"
+                      }
+                    },
+                    "type": "object"
+                  },
+                  "mode": {
+                    "description": "Mode is only valid for sub steps, it defines the mode of the sub steps",
+                    "nullable": true,
+                    "type": "string"
+                  },
                   "name": {
-                    "description": "A unique name for this workflow step.",
+                    "description": "Name is the unique name of the workflow step.",
                     "type": "string"
                   },
                   "outputs": {
+                    "description": "Outputs is the outputs of the step",
+                    "items": {
+                      "description": "OutputItem defines an output variable of WorkflowStep",
+                      "properties": {
+                        "name": {
+                          "type": "string"
+                        },
+                        "valueFrom": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "name",
+                        "valueFrom"
+                      ],
+                      "type": "object"
+                    },
                     "type": "array"
                   },
                   "properties": {
-                    "description": "Step-specific properties. Set 'type' first, then Ctrl+Space here.",
-                    "type": "object"
+                    "description": "Properties is the properties of the step",
+                    "type": "object",
+                    "x-kubernetes-preserve-unknown-fields": true
+                  },
+                  "subSteps": {
+                    "items": {
+                      "description": "WorkflowStepBase defines the workflow step base",
+                      "properties": {
+                        "dependsOn": {
+                          "description": "DependsOn is the dependency of the step",
+                          "items": {
+                            "type": "string"
+                          },
+                          "type": "array"
+                        },
+                        "if": {
+                          "description": "If is the if condition of the step",
+                          "type": "string"
+                        },
+                        "inputs": {
+                          "description": "Inputs is the inputs of the step",
+                          "items": {
+                            "description": "InputItem defines an input variable of WorkflowStep",
+                            "properties": {
+                              "from": {
+                                "type": "string"
+                              },
+                              "parameterKey": {
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "from"
+                            ],
+                            "type": "object"
+                          },
+                          "type": "array"
+                        },
+                        "meta": {
+                          "description": "Meta is the meta data of the workflow step.",
+                          "properties": {
+                            "alias": {
+                              "type": "string"
+                            }
+                          },
+                          "type": "object"
+                        },
+                        "name": {
+                          "description": "Name is the unique name of the workflow step.",
+                          "type": "string"
+                        },
+                        "outputs": {
+                          "description": "Outputs is the outputs of the step",
+                          "items": {
+                            "description": "OutputItem defines an output variable of WorkflowStep",
+                            "properties": {
+                              "name": {
+                                "type": "string"
+                              },
+                              "valueFrom": {
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "name",
+                              "valueFrom"
+                            ],
+                            "type": "object"
+                          },
+                          "type": "array"
+                        },
+                        "properties": {
+                          "description": "Properties is the properties of the step",
+                          "type": "object",
+                          "x-kubernetes-preserve-unknown-fields": true
+                        },
+                        "timeout": {
+                          "description": "Timeout is the timeout of the step",
+                          "type": "string"
+                        },
+                        "type": {
+                          "description": "Type is the type of the workflow step.",
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "type"
+                      ],
+                      "type": "object"
+                    },
+                    "type": "array"
                   },
                   "timeout": {
-                    "description": "Maximum time to wait for this step, e.g. '10m'.",
+                    "description": "Timeout is the timeout of the step",
                     "type": "string"
                   },
                   "type": {
-                    "description": "The workflow step type. Controls which 'properties' are valid.",
+                    "description": "Type is the type of the workflow step.",
                     "enum": [
                       "apply-application",
                       "apply-application-in-parallel",
@@ -1970,7 +2112,6 @@
                   }
                 },
                 "required": [
-                  "name",
                   "type"
                 ],
                 "type": "object"
@@ -1985,14 +2126,475 @@
         "components"
       ],
       "type": "object"
+    },
+    "status": {
+      "description": "AppStatus defines the observed state of Application",
+      "properties": {
+        "appliedResources": {
+          "description": "AppliedResources record the resources that the  workflow step apply.",
+          "items": {
+            "description": "ClusterObjectReference defines the object reference with cluster.",
+            "properties": {
+              "apiVersion": {
+                "description": "API version of the referent.",
+                "type": "string"
+              },
+              "cluster": {
+                "type": "string"
+              },
+              "creator": {
+                "type": "string"
+              },
+              "fieldPath": {
+                "description": "If referring to a piece of an object instead of an entire object, this string\nshould contain a valid JSON/Go field access statement, such as desiredState.manifest.containers[2].\nFor example, if the object reference is to a container within a pod, this would take on a value like:\n\"spec.containers{name}\" (where \"name\" refers to the name of the container that triggered\nthe event) or if no container name is specified \"spec.containers[2]\" (container with\nindex 2 in this pod). This syntax is chosen only to have some well-defined way of\nreferencing a part of an object.",
+                "type": "string"
+              },
+              "kind": {
+                "description": "Kind of the referent.\nMore info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
+                "type": "string"
+              },
+              "name": {
+                "description": "Name of the referent.\nMore info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names",
+                "type": "string"
+              },
+              "namespace": {
+                "description": "Namespace of the referent.\nMore info: https://kubernetes.io/docs/concepts/overview/working-with-objects/namespaces/",
+                "type": "string"
+              },
+              "resourceVersion": {
+                "description": "Specific resourceVersion to which this reference is made, if any.\nMore info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#concurrency-control-and-consistency",
+                "type": "string"
+              },
+              "uid": {
+                "description": "UID of the referent.\nMore info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#uids",
+                "type": "string"
+              }
+            },
+            "type": "object",
+            "x-kubernetes-map-type": "atomic"
+          },
+          "type": "array"
+        },
+        "components": {
+          "description": "Components record the related Components created by Application Controller",
+          "items": {
+            "description": "ObjectReference contains enough information to let you inspect or modify the referred object.",
+            "properties": {
+              "apiVersion": {
+                "description": "API version of the referent.",
+                "type": "string"
+              },
+              "fieldPath": {
+                "description": "If referring to a piece of an object instead of an entire object, this string\nshould contain a valid JSON/Go field access statement, such as desiredState.manifest.containers[2].\nFor example, if the object reference is to a container within a pod, this would take on a value like:\n\"spec.containers{name}\" (where \"name\" refers to the name of the container that triggered\nthe event) or if no container name is specified \"spec.containers[2]\" (container with\nindex 2 in this pod). This syntax is chosen only to have some well-defined way of\nreferencing a part of an object.",
+                "type": "string"
+              },
+              "kind": {
+                "description": "Kind of the referent.\nMore info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
+                "type": "string"
+              },
+              "name": {
+                "description": "Name of the referent.\nMore info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names",
+                "type": "string"
+              },
+              "namespace": {
+                "description": "Namespace of the referent.\nMore info: https://kubernetes.io/docs/concepts/overview/working-with-objects/namespaces/",
+                "type": "string"
+              },
+              "resourceVersion": {
+                "description": "Specific resourceVersion to which this reference is made, if any.\nMore info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#concurrency-control-and-consistency",
+                "type": "string"
+              },
+              "uid": {
+                "description": "UID of the referent.\nMore info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#uids",
+                "type": "string"
+              }
+            },
+            "type": "object",
+            "x-kubernetes-map-type": "atomic"
+          },
+          "type": "array"
+        },
+        "conditions": {
+          "description": "Conditions of the resource.",
+          "items": {
+            "description": "A Condition that may apply to a resource.",
+            "properties": {
+              "lastTransitionTime": {
+                "description": "LastTransitionTime is the last time this condition transitioned from one\nstatus to another.",
+                "format": "date-time",
+                "type": "string"
+              },
+              "message": {
+                "description": "A Message containing details about this condition's last transition from\none status to another, if any.",
+                "type": "string"
+              },
+              "reason": {
+                "description": "A Reason for this condition's last transition from one status to another.",
+                "type": "string"
+              },
+              "status": {
+                "description": "Status of this condition; is it currently True, False, or Unknown?",
+                "type": "string"
+              },
+              "type": {
+                "description": "Type of this condition. At most one of each condition type may apply to\na resource at any point in time.",
+                "type": "string"
+              }
+            },
+            "required": [
+              "lastTransitionTime",
+              "reason",
+              "status",
+              "type"
+            ],
+            "type": "object"
+          },
+          "type": "array"
+        },
+        "latestRevision": {
+          "description": "LatestRevision of the application configuration it generates",
+          "properties": {
+            "name": {
+              "type": "string"
+            },
+            "revision": {
+              "format": "int64",
+              "type": "integer"
+            },
+            "revisionHash": {
+              "description": "RevisionHash record the hash value of the spec of ApplicationRevision object.",
+              "type": "string"
+            }
+          },
+          "required": [
+            "name",
+            "revision"
+          ],
+          "type": "object"
+        },
+        "observedGeneration": {
+          "description": "The generation observed by the application controller.",
+          "format": "int64",
+          "type": "integer"
+        },
+        "policy": {
+          "description": "PolicyStatus records the status of policy\nDeprecated This field is only used by EnvBinding Policy which is deprecated.",
+          "items": {
+            "description": "PolicyStatus records the status of policy\nDeprecated",
+            "properties": {
+              "name": {
+                "type": "string"
+              },
+              "status": {
+                "type": "object",
+                "x-kubernetes-preserve-unknown-fields": true
+              },
+              "type": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "name",
+              "type"
+            ],
+            "type": "object"
+          },
+          "type": "array"
+        },
+        "services": {
+          "description": "Services record the status of the application services",
+          "items": {
+            "description": "ApplicationComponentStatus record the health status of App component",
+            "properties": {
+              "cluster": {
+                "type": "string"
+              },
+              "details": {
+                "additionalProperties": {
+                  "type": "string"
+                },
+                "type": "object"
+              },
+              "env": {
+                "type": "string"
+              },
+              "healthy": {
+                "type": "boolean"
+              },
+              "message": {
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              },
+              "namespace": {
+                "type": "string"
+              },
+              "scopes": {
+                "items": {
+                  "description": "ObjectReference contains enough information to let you inspect or modify the referred object.",
+                  "properties": {
+                    "apiVersion": {
+                      "description": "API version of the referent.",
+                      "type": "string"
+                    },
+                    "fieldPath": {
+                      "description": "If referring to a piece of an object instead of an entire object, this string\nshould contain a valid JSON/Go field access statement, such as desiredState.manifest.containers[2].\nFor example, if the object reference is to a container within a pod, this would take on a value like:\n\"spec.containers{name}\" (where \"name\" refers to the name of the container that triggered\nthe event) or if no container name is specified \"spec.containers[2]\" (container with\nindex 2 in this pod). This syntax is chosen only to have some well-defined way of\nreferencing a part of an object.",
+                      "type": "string"
+                    },
+                    "kind": {
+                      "description": "Kind of the referent.\nMore info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
+                      "type": "string"
+                    },
+                    "name": {
+                      "description": "Name of the referent.\nMore info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names",
+                      "type": "string"
+                    },
+                    "namespace": {
+                      "description": "Namespace of the referent.\nMore info: https://kubernetes.io/docs/concepts/overview/working-with-objects/namespaces/",
+                      "type": "string"
+                    },
+                    "resourceVersion": {
+                      "description": "Specific resourceVersion to which this reference is made, if any.\nMore info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#concurrency-control-and-consistency",
+                      "type": "string"
+                    },
+                    "uid": {
+                      "description": "UID of the referent.\nMore info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#uids",
+                      "type": "string"
+                    }
+                  },
+                  "type": "object",
+                  "x-kubernetes-map-type": "atomic"
+                },
+                "type": "array"
+              },
+              "traits": {
+                "items": {
+                  "description": "ApplicationTraitStatus records the trait health status",
+                  "properties": {
+                    "details": {
+                      "additionalProperties": {
+                        "type": "string"
+                      },
+                      "type": "object"
+                    },
+                    "healthy": {
+                      "type": "boolean"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "type": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "healthy",
+                    "type"
+                  ],
+                  "type": "object"
+                },
+                "type": "array"
+              },
+              "workloadDefinition": {
+                "description": "WorkloadDefinition is the definition of a WorkloadDefinition, such as deployments/apps.v1",
+                "properties": {
+                  "apiVersion": {
+                    "type": "string"
+                  },
+                  "kind": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "apiVersion",
+                  "kind"
+                ],
+                "type": "object"
+              }
+            },
+            "required": [
+              "healthy",
+              "name"
+            ],
+            "type": "object"
+          },
+          "type": "array"
+        },
+        "status": {
+          "description": "ApplicationPhase is a label for the condition of an application at the current time",
+          "type": "string"
+        },
+        "workflow": {
+          "description": "Workflow record the status of workflow",
+          "properties": {
+            "appRevision": {
+              "type": "string"
+            },
+            "contextBackend": {
+              "description": "ObjectReference contains enough information to let you inspect or modify the referred object.",
+              "properties": {
+                "apiVersion": {
+                  "description": "API version of the referent.",
+                  "type": "string"
+                },
+                "fieldPath": {
+                  "description": "If referring to a piece of an object instead of an entire object, this string\nshould contain a valid JSON/Go field access statement, such as desiredState.manifest.containers[2].\nFor example, if the object reference is to a container within a pod, this would take on a value like:\n\"spec.containers{name}\" (where \"name\" refers to the name of the container that triggered\nthe event) or if no container name is specified \"spec.containers[2]\" (container with\nindex 2 in this pod). This syntax is chosen only to have some well-defined way of\nreferencing a part of an object.",
+                  "type": "string"
+                },
+                "kind": {
+                  "description": "Kind of the referent.\nMore info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
+                  "type": "string"
+                },
+                "name": {
+                  "description": "Name of the referent.\nMore info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names",
+                  "type": "string"
+                },
+                "namespace": {
+                  "description": "Namespace of the referent.\nMore info: https://kubernetes.io/docs/concepts/overview/working-with-objects/namespaces/",
+                  "type": "string"
+                },
+                "resourceVersion": {
+                  "description": "Specific resourceVersion to which this reference is made, if any.\nMore info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#concurrency-control-and-consistency",
+                  "type": "string"
+                },
+                "uid": {
+                  "description": "UID of the referent.\nMore info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#uids",
+                  "type": "string"
+                }
+              },
+              "type": "object",
+              "x-kubernetes-map-type": "atomic"
+            },
+            "endTime": {
+              "format": "date-time",
+              "nullable": true,
+              "type": "string"
+            },
+            "finished": {
+              "type": "boolean"
+            },
+            "message": {
+              "type": "string"
+            },
+            "mode": {
+              "type": "string"
+            },
+            "startTime": {
+              "format": "date-time",
+              "type": "string"
+            },
+            "status": {
+              "description": "WorkflowRunPhase is a label for the condition of a WorkflowRun at the current time",
+              "type": "string"
+            },
+            "steps": {
+              "items": {
+                "description": "WorkflowStepStatus record the status of a workflow step, include step status and subStep status",
+                "properties": {
+                  "firstExecuteTime": {
+                    "description": "FirstExecuteTime is the first time this step execution.",
+                    "format": "date-time",
+                    "type": "string"
+                  },
+                  "id": {
+                    "type": "string"
+                  },
+                  "lastExecuteTime": {
+                    "description": "LastExecuteTime is the last time this step execution.",
+                    "format": "date-time",
+                    "type": "string"
+                  },
+                  "message": {
+                    "description": "A human readable message indicating details about why the workflowStep is in this state.",
+                    "type": "string"
+                  },
+                  "name": {
+                    "type": "string"
+                  },
+                  "phase": {
+                    "description": "WorkflowStepPhase describes the phase of a workflow step.",
+                    "type": "string"
+                  },
+                  "reason": {
+                    "description": "A brief CamelCase message indicating details about why the workflowStep is in this state.",
+                    "type": "string"
+                  },
+                  "subSteps": {
+                    "items": {
+                      "description": "StepStatus record the base status of workflow step, which could be workflow step or subStep",
+                      "properties": {
+                        "firstExecuteTime": {
+                          "description": "FirstExecuteTime is the first time this step execution.",
+                          "format": "date-time",
+                          "type": "string"
+                        },
+                        "id": {
+                          "type": "string"
+                        },
+                        "lastExecuteTime": {
+                          "description": "LastExecuteTime is the last time this step execution.",
+                          "format": "date-time",
+                          "type": "string"
+                        },
+                        "message": {
+                          "description": "A human readable message indicating details about why the workflowStep is in this state.",
+                          "type": "string"
+                        },
+                        "name": {
+                          "type": "string"
+                        },
+                        "phase": {
+                          "description": "WorkflowStepPhase describes the phase of a workflow step.",
+                          "type": "string"
+                        },
+                        "reason": {
+                          "description": "A brief CamelCase message indicating details about why the workflowStep is in this state.",
+                          "type": "string"
+                        },
+                        "type": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "id"
+                      ],
+                      "type": "object"
+                    },
+                    "type": "array"
+                  },
+                  "type": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "id"
+                ],
+                "type": "object"
+              },
+              "type": "array"
+            },
+            "suspend": {
+              "type": "boolean"
+            },
+            "suspendState": {
+              "type": "string"
+            },
+            "terminated": {
+              "type": "boolean"
+            }
+          },
+          "required": [
+            "finished",
+            "mode",
+            "suspend",
+            "terminated"
+          ],
+          "type": "object"
+        }
+      },
+      "type": "object"
     }
   },
-  "required": [
-    "apiVersion",
-    "kind",
-    "metadata",
-    "spec"
-  ],
-  "title": "KubeVela Application",
   "type": "object"
 }
