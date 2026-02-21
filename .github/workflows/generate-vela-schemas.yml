@@ -1,0 +1,217 @@
+name: 🔐 Generate KubeVela Schemas
+
+# ==============================================================================
+# TRIGGERS
+# ==============================================================================
+on:
+  workflow_dispatch:
+    inputs:
+      commit_schemas:
+        description: 'Commit generated schemas back to the repo?'
+        type: boolean
+        default: true
+      debug_mode:
+        description: 'Enable extra verbose Dagger output?'
+        type: boolean
+        default: false
+  push:
+    branches:
+      - main
+    paths:
+      - '.ci/**'
+
+# ==============================================================================
+# PERMISSIONS — needed so the bot can push the generated schemas back
+# ==============================================================================
+permissions:
+  contents: write
+
+# ==============================================================================
+# JOBS
+# ==============================================================================
+jobs:
+  generate-schemas:
+    name: 🚀 Extract & Generate KubeVela Schemas
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      # --------------------------------------------------------------------------
+      # 1. Checkout
+      # --------------------------------------------------------------------------
+      - name: ⬇️ Checkout repository
+        uses: actions/checkout@v4
+
+      # --------------------------------------------------------------------------
+      # 2. Go toolchain (matches .ci/go.mod)
+      # --------------------------------------------------------------------------
+      - name: 🐹 Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.24'
+          cache-dependency-path: .ci/go.sum
+
+      # --------------------------------------------------------------------------
+      # 3. Doppler CLI
+      # --------------------------------------------------------------------------
+      - name: 🔑 Install Doppler CLI
+        uses: dopplerhq/cli-action@v3
+
+      # --------------------------------------------------------------------------
+      # 4. Verify Doppler token is present and the secrets we need actually exist.
+      #    This gives a clear error BEFORE we waste time downloading tools.
+      # --------------------------------------------------------------------------
+      - name: 🩺 Validate Doppler token & required secrets
+        env:
+          DOPPLER_TOKEN: ${{ secrets.DOPPLERDEV }}
+        run: |
+          set -euo pipefail
+
+          echo "──────────────────────────────────────────"
+          echo "🔍 Doppler CLI version"
+          echo "──────────────────────────────────────────"
+          doppler --version
+
+          echo ""
+          echo "──────────────────────────────────────────"
+          echo "🔍 Checking token is accepted by Doppler API..."
+          echo "──────────────────────────────────────────"
+          # 'doppler secrets' exits non-zero if the token is invalid
+          doppler secrets --only-names 2>&1 | head -40
+
+          echo ""
+          echo "──────────────────────────────────────────"
+          echo "🔍 Confirming required secrets exist..."
+          echo "──────────────────────────────────────────"
+          SECRETS=$(doppler secrets --only-names)
+
+          for SECRET in TAILSCALE_AUTH_KEY KUBECONFIG_BASE64; do
+            if echo "$SECRETS" | grep -qx "$SECRET"; then
+              echo "  ✅  $SECRET — found"
+            else
+              echo "  ❌  $SECRET — MISSING. Add it in your Doppler project."
+              exit 1
+            fi
+          done
+
+          echo ""
+          echo "✅ Doppler validation passed."
+
+      # --------------------------------------------------------------------------
+      # 5. Dagger CLI — pinned to the engine version in .ci/dagger.json
+      # --------------------------------------------------------------------------
+      - name: ⚙️ Install Dagger CLI (v0.19.11)
+        run: |
+          set -euo pipefail
+          echo "──────────────────────────────────────────"
+          echo "📥 Downloading Dagger CLI v0.19.11..."
+          echo "──────────────────────────────────────────"
+          curl -fsSL https://dl.dagger.io/dagger/install.sh | \
+            BIN_DIR=/usr/local/bin DAGGER_VERSION=0.19.11 sh
+
+          echo ""
+          echo "🔍 Dagger version:"
+          dagger version
+
+      # --------------------------------------------------------------------------
+      # 6. Run the Dagger pipeline.
+      #
+      #    Doppler injects: TAILSCALE_AUTH_KEY, KUBECONFIG_BASE64
+      #    Dagger reads them via env:// references — nothing ever written to disk.
+      #
+      #    DAGGER_LOG_FORMAT=plain  → human-readable lines instead of TUI spinners
+      #    DEBUG_MODE input         → enables --progress=plain for max verbosity
+      # --------------------------------------------------------------------------
+      - name: 🏗️ Run Dagger Pipeline (via Doppler)
+        env:
+          DOPPLER_TOKEN: ${{ secrets.DOPPLERDEV }}
+          # Force plain text logs so every container stdout line shows in the GH log
+          DAGGER_LOG_FORMAT: plain
+          # Set to 'true' when debug_mode input is selected
+          DEBUG_MODE: ${{ github.event.inputs.debug_mode || 'false' }}
+        run: |
+          set -euo pipefail
+
+          echo "──────────────────────────────────────────"
+          echo "🏗️  Starting Dagger pipeline via Doppler"
+          echo "   Runner OS  : $(uname -a)"
+          echo "   Dagger ver : $(dagger version)"
+          echo "   Debug mode : $DEBUG_MODE"
+          echo "──────────────────────────────────────────"
+
+          # Build extra flags when debug mode is on
+          PROGRESS_FLAG="--progress=auto"
+          if [ "$DEBUG_MODE" = "true" ]; then
+            PROGRESS_FLAG="--progress=plain"
+          fi
+
+          # doppler run -- exports ALL project secrets as env vars for the child process
+          doppler run -- bash -c "
+            set -euo pipefail
+
+            echo '🔗 Secrets loaded from Doppler. Invoking Dagger...'
+            echo ''
+
+            dagger call $PROGRESS_FLAG \
+              --mod ./.ci \
+              actions \
+              generate-vela-schemas \
+                --tailscale-auth-key env:TAILSCALE_AUTH_KEY \
+                --kubeconfig-base64  env:KUBECONFIG_BASE64 \
+              export \
+                --path ./schemas/kubevela
+
+            echo ''
+            echo '✅ Dagger pipeline completed successfully.'
+          "
+
+      # --------------------------------------------------------------------------
+      # 7. Dump generated schema inventory — always runs so you can see output
+      #    even when the commit step is skipped.
+      # --------------------------------------------------------------------------
+      - name: 📋 Inspect generated schemas
+        if: always()
+        run: |
+          echo "──────────────────────────────────────────"
+          echo "📂 Schema output directory tree"
+          echo "──────────────────────────────────────────"
+          if [ -d "./schemas/kubevela" ]; then
+            find ./schemas/kubevela -type f | sort | while read -r f; do
+              SIZE=$(wc -c < "$f")
+              echo "  📄 $f  (${SIZE} bytes)"
+            done
+            echo ""
+            TOTAL=$(find ./schemas/kubevela -type f | wc -l)
+            echo "  🗂️  Total files: $TOTAL"
+          else
+            echo "  ⚠️  schemas/kubevela directory does NOT exist!"
+            echo "      This means the Dagger pipeline did not produce output."
+            echo "      Check the 'Run Dagger Pipeline' step above for errors."
+          fi
+
+      # --------------------------------------------------------------------------
+      # 8. Commit & push the schemas back to the repository.
+      # --------------------------------------------------------------------------
+      - name: 📝 Commit generated schemas
+        if: |
+          success() && (
+            github.event_name == 'push' ||
+            (github.event_name == 'workflow_dispatch' && inputs.commit_schemas == true)
+          )
+        run: |
+          set -euo pipefail
+
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+          git add schemas/kubevela/
+
+          if git diff --cached --quiet; then
+            echo "✅ No schema changes detected — nothing to commit."
+          else
+            CHANGED=$(git diff --cached --name-only | wc -l)
+            TIMESTAMP=$(date -u '+%Y-%m-%dT%H:%M:%SZ')
+            git commit -m "ci: regenerate KubeVela schemas [${TIMESTAMP}] (${CHANGED} files changed)"
+            git push
+            echo "🚀 Pushed ${CHANGED} changed schema file(s) to the repo."
+          fi
