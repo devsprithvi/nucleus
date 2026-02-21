@@ -376,6 +376,11 @@ func buildMasterSchema(dir *dagger.Directory, crdJSON []byte, entries []schemaEn
 	// We use a helper that safely walks the map without panicking on missing keys
 	compItems := dig(schema, "properties", "spec", "properties", "components", "items")
 	if compItems != nil {
+		// Remove the base generic "properties" to prevent VS Code showing duplicates
+		if propsMap, ok := dig(compItems, "properties").(map[string]interface{}); ok {
+			delete(propsMap, "properties")
+		}
+
 		// Inject enum + conditionals onto the component item schema
 		if typeObj := dig(compItems, "properties", "type"); typeObj != nil {
 			if m, ok := typeObj.(map[string]interface{}); ok {
@@ -387,6 +392,9 @@ func buildMasterSchema(dir *dagger.Directory, crdJSON []byte, entries []schemaEn
 		// Inject trait type enum + conditionals into traits.items
 		traitItems := dig(compItems, "properties", "traits", "items")
 		if traitItems != nil {
+			if propsMap, ok := dig(traitItems, "properties").(map[string]interface{}); ok {
+				delete(propsMap, "properties")
+			}
 			if typeObj := dig(traitItems, "properties", "type"); typeObj != nil {
 				if m, ok := typeObj.(map[string]interface{}); ok {
 					m["enum"] = typeEnum(traitEntries)
@@ -399,6 +407,9 @@ func buildMasterSchema(dir *dagger.Directory, crdJSON []byte, entries []schemaEn
 	// Navigate: spec → properties → policies → items
 	policyItems := dig(schema, "properties", "spec", "properties", "policies", "items")
 	if policyItems != nil {
+		if propsMap, ok := dig(policyItems, "properties").(map[string]interface{}); ok {
+			delete(propsMap, "properties")
+		}
 		if typeObj := dig(policyItems, "properties", "type"); typeObj != nil {
 			if m, ok := typeObj.(map[string]interface{}); ok {
 				m["enum"] = typeEnum(policyEntries)
@@ -410,6 +421,9 @@ func buildMasterSchema(dir *dagger.Directory, crdJSON []byte, entries []schemaEn
 	// Navigate: spec → properties → workflow → properties → steps → items
 	wfItems := dig(schema, "properties", "spec", "properties", "workflow", "properties", "steps", "items")
 	if wfItems != nil {
+		if propsMap, ok := dig(wfItems, "properties").(map[string]interface{}); ok {
+			delete(propsMap, "properties")
+		}
 		if typeObj := dig(wfItems, "properties", "type"); typeObj != nil {
 			if m, ok := typeObj.(map[string]interface{}); ok {
 				m["enum"] = typeEnum(wfEntries)
