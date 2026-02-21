@@ -168,7 +168,12 @@ func executeVPNAndFetch(
 		# ── PHASE 6: kubectl connectivity check ───────────────────────────────────
 		echo "" >&2
 		echo "━━━ PHASE 6: Routing kubectl through SOCKS5 proxy ━━━" >&2
-		export ALL_PROXY=socks5://localhost:1055
+		# IMPORTANT: kubectl uses Go's net/http which only reads HTTPS_PROXY / HTTP_PROXY.
+		# ALL_PROXY is a Unix convention that Go ignores — kubectl will dial directly without this.
+		export HTTPS_PROXY=socks5://localhost:1055
+		export HTTP_PROXY=socks5://localhost:1055
+		# Unset ALL_PROXY to avoid confusion
+		unset ALL_PROXY
 
 		MAX_ATTEMPTS=5
 		for i in $(seq 1 $MAX_ATTEMPTS); do
