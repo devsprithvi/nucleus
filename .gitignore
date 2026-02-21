@@ -101,6 +101,9 @@ go.work.sum
 # =============================================================================
 .idea/
 .vscode/
+# Shared team settings (schema wiring, recommended extensions) ARE committed
+!.vscode/settings.json
+!.vscode/extensions.json
 *.swp
 *.swo
 *~

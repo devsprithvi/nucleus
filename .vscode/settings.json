@@ -1,0 +1,125 @@
+{
+  "explorer.fileNesting.enabled": true,
+  "explorer.fileNesting.expand": false,
+  "explorer.fileNesting.patterns": {
+    /* * =========================================================================
+     * ROOT & REPOSITORY ORCHESTRATION
+     * =========================================================================
+     */
+    // DOCUMENTATION:
+    // Keep the root clean. CHANGELOG, LICENSE, and specialized readmes hide under the main README.
+    "README.md": "README_*, CHANGELOG*, LICENSE*, CONTRIBUTING*, CODE_OF_CONDUCT*, SECURITY*, AUTHORS, PATRONS, CITATION*, INFRASTRUCTURE*",
+    // THE CONSTITUTION (.editorconfig):
+    // This is the top-level rule file.
+    // Logic: We nest .gitignore under .editorconfig because the "Editor Rules" logically precede "Git Rules".
+    ".editorconfig": ".gitignore",
+    // GIT CONFIGURATION:
+    // .gitignore manages the specific git files.
+    // Note: Even if nested under .editorconfig, this pattern still applies to .gitignore itself.
+    ".gitignore": ".gitattributes, .gitmodules, .gitkeep, .git-blame-ignore-revs",
+    // REPOSITORY COMMANDER (Taskfile):
+    // The entry point for all repository tasks (build, test, lint).
+    // It stands alone at the root but hides its own config variants/includes.
+    "Taskfile.yml": "Taskfile.dist.yml, Taskfile.*.yml, .task, Taskfile.yaml",
+    "Taskfile.yaml": "Taskfile.dist.yaml, Taskfile.*.yaml, .task",
+    // ENVIRONMENT:
+    // All env variants hide under the main .env file.
+    ".env": ".env.*, .envrc, env.d.ts",
+    // CONTAINERS:
+    // Dockerfile owns its ignore file. Compose owns overrides.
+    "Dockerfile": ".dockerignore, Dockerfile.*",
+    "docker-compose.yml": "docker-compose.*.yml, .dockerignore",
+    /* * =========================================================================
+     * JAVASCRIPT / TYPESCRIPT (BUN & OXC STACK)
+     * =========================================================================
+     */
+    // PACKAGE.JSON (The 'King' of JS):
+    // 1. Lockfiles: Supports Bun (.lockb/.lock) and legacy managers.
+    // 2. Tooling: TypeScript configs hide here.
+    // 3. Oxc Toolchain: Linter (oxlint) and Formatter (oxfmt) configs hide here.
+    "package.json": "bun.lockb, bun.lock, package-lock.json, yarn.lock, pnpm-lock.yaml, node_modules, tsconfig.json, tsconfig.*.json, .oxlintrc*, oxlint.json, .oxfmtrc*, oxfmt.json, .npmrc, .nvmrc",
+    // COMPONENT/MODULE NESTING:
+    // If 'index.ts' exists, it hides related CSS/Test files.
+    "index.ts": "index.css, index.module.css, index.test.ts, index.spec.ts",
+    /* * =========================================================================
+     * GOLANG (MODERN WORKSPACE STACK)
+     * =========================================================================
+     */
+    // GO WORKSPACES (The 'King' of Go Repo):
+    // The root orchestrator. Hides the checksums.
+    "go.work": "go.work.sum",
+    // GO MODULES (The 'King' of Go Service):
+    // Each service/lib module. Hides the checksum and Air (live-reload) config.
+    "go.mod": "go.sum, .air.toml",
+    // GO TESTING:
+    // 1. Files ending in .go hide their _test.go counterparts.
+    // 2. main.go hides main_test.go explicitly.
+    "main.go": "main_test.go",
+    "*.go": "${capture}_test.go"
+  },
+
+  "yaml.customTags": ["!Example", "!Ref"],
+
+  // ==========================================================================
+  // KUBEVELA AUTO-COMPLETION
+  // ==========================================================================
+  // Maps the locally generated KubeVela master schema to every app.yaml file
+  // under the apps/ directory. This gives you:
+  //   ✅ Auto-complete on 'type:' (webservice, worker, statefulset, ...)
+  //   ✅ Property suggestions under 'properties:' per component type
+  //   ✅ Validation squiggles for wrong field names
+  //   ✅ Hover documentation from the schema
+  //
+  // The schema is generated from your live cluster by running:
+  //   GitHub Actions → "Generate KubeVela Schemas" → Run workflow
+  //
+  // The key is the schema file path (relative to workspace root).
+  // The value is a glob that controls which files this schema applies to.
+  "yaml.schemas": {
+    "./schemas/kubevela/vela-application-schema.json": [
+      "apps/**/app.yaml",
+      "apps/**/*.vela.yaml"
+    ]
+  },
+
+  /* * =========================================================================
+   * VISIBILITY & PERFORMANCE (CRITICAL)
+   * =========================================================================
+   */
+  // 1. VISUAL NOISE REMOVAL (Hides from Explorer)
+  // Completely removes these folders from the Side Bar tree.
+  // This keeps your project view clean and focused on your source code.
+  "files.exclude": {
+    "**/node_modules": true, // Hides the massive JS dependency folder
+    "**/.venv": true, // Hides Python virtual environments
+    "**/vendor": true, // Hides Go/PHP vendor folders
+    "**/.git": true, // Hides Git internals
+    "**/.task": true, // Hides Taskfile cache/temp files
+    "**/dist": true, // Hides build artifacts
+    // "**/build": true,           // Hides build artifacts
+    "**/.DS_Store": true, // Hides Mac system files
+    "**/Thumbs.db": true // Hides Windows system files
+  },
+  // 2. SEARCH PERFORMANCE (Hides from Ctrl+Shift+F)
+  // Prevents 'Find in Files' from scanning massive dependency trees.
+  // Without this, searching "TODO" would return 5,000 results from your libraries.
+  "search.exclude": {
+    "**/node_modules": true,
+    "**/.venv": true,
+    "**/vendor": true,
+    "**/.git": true,
+    "**/.task": true,
+    "**/dist": true,
+    "**/build": true
+  },
+  // 3. CPU SAVER (Hides from File Watcher)
+  // Stops VS Code from using CPU/RAM to monitor every single file change inside these folders.
+  // This fixes the "VS Code is using 100% CPU" issue in large monorepos.
+  "files.watcherExclude": {
+    "**/node_modules/**": true,
+    "**/.venv/**": true,
+    "**/.git/objects/**": true,
+    "**/dist/**": true,
+    "**/build/**": true
+  }
+}

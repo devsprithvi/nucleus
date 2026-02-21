@@ -50,10 +50,11 @@ func (a *Actions) GenerateVelaSchemas(
 
 	// Phase 3: Create a new virtual Dagger Directory and write all individual schemas
 	schemaDir := dag.Directory()
-	schemaDir, extractedNames := writeIndividualSchemas(schemaDir, list)
+	var entries []schemaEntry
+	schemaDir, entries = writeIndividualSchemas(schemaDir, list)
 
 	// Phase 4: Inject the Master Schema for IDE routing
-	schemaDir, err = injectMasterSchema(schemaDir, extractedNames)
+	schemaDir, err = injectMasterSchema(schemaDir, entries)
 	if err != nil {
 		return nil, fmt.Errorf("phase 4 (master schema routing) failed: %w", err)
 	}
@@ -214,43 +215,82 @@ func buildRunnerContainer(dag *dagger.Client) *dagger.Container {
 		WithExec([]string{"bash", "-c", "curl -LO https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl && chmod +x kubectl && mv kubectl /usr/local/bin/"})
 }
 
-// writeIndividualSchemas loops through the retrieved ConfigMaps and writes each JSON schema into the Dagger directory.
-func writeIndividualSchemas(dir *dagger.Directory, list SchemaMapList) (*dagger.Directory, []string) {
-	var extractedNames []string
+// schemaEntry pairs the short KubeVela type name (what users write in YAML)
+// with the full filename used for $ref routing.
+type schemaEntry struct {
+	// typeName is the short name the user writes in their app.yaml, e.g. "webservice"
+	typeName string
+	// fileName is the full schema file saved to disk, e.g. "component-schema-webservice-schema.json"
+	fileName string
+}
+
+// categoryPrefixes are the prefixes that KubeVela prepends to ConfigMap names.
+// Stripping these gives the actual component/trait/policy type name.
+var categoryPrefixes = []string{
+	"component-schema-",
+	"trait-schema-",
+	"policy-schema-",
+	"workflowstep-schema-",
+}
+
+// shortTypeName strips both the outer "schema-" prefix and the category prefix
+// to derive the real KubeVela type name (e.g. "schema-component-schema-webservice" → "webservice").
+func shortTypeName(configMapName string) string {
+	// Strip the outer "schema-" added by KubeVela's ConfigMap naming
+	name := strings.TrimPrefix(configMapName, "schema-")
+	for _, prefix := range categoryPrefixes {
+		if strings.HasPrefix(name, prefix) {
+			return strings.TrimPrefix(name, prefix)
+		}
+	}
+	// Fallback: return as-is if no known prefix matches
+	return name
+}
+
+// writeIndividualSchemas loops through the retrieved ConfigMaps and writes each
+// JSON schema into the Dagger directory. It returns schemaEntry pairs so the
+// master schema can correctly map short type names to file references.
+func writeIndividualSchemas(dir *dagger.Directory, list SchemaMapList) (*dagger.Directory, []schemaEntry) {
+	var entries []schemaEntry
 
 	for _, item := range list.Items {
-		defName := strings.TrimPrefix(item.Metadata.Name, "schema-")
 		schemaContent, ok := item.Data["openapi-v3-json-schema"]
 		if !ok || schemaContent == "" {
 			continue
 		}
 
-		extractedNames = append(extractedNames, defName)
-		fileName := fmt.Sprintf("%s-schema.json", defName)
+		// e.g. "schema-component-schema-webservice" → full name without outer prefix
+		fullName := strings.TrimPrefix(item.Metadata.Name, "schema-")
+		fileName := fmt.Sprintf("%s-schema.json", fullName)
+		typeName := shortTypeName(item.Metadata.Name)
 
-		// Insert the new file into the immutable virtual directory
+		entries = append(entries, schemaEntry{typeName: typeName, fileName: fileName})
 		dir = dir.WithNewFile(fileName, schemaContent)
 	}
 
-	return dir, extractedNames
+	return dir, entries
 }
 
-// injectMasterSchema dynamically builds the root vela-application-schema.json file to map 'type' to the correct schema file.
-func injectMasterSchema(dir *dagger.Directory, componentNames []string) (*dagger.Directory, error) {
+// injectMasterSchema dynamically builds the root vela-application-schema.json
+// that routes the 'type' field in a component entry to its specific schema file.
+// The if/const matches the SHORT type name (e.g. "webservice") that users write
+// in their app.yaml, while the $ref points to the full filename on disk.
+func injectMasterSchema(dir *dagger.Directory, entries []schemaEntry) (*dagger.Directory, error) {
 	var oneOfRules []map[string]interface{}
 
-	for _, name := range componentNames {
-		// Create the conditional routing logic for the IDE
+	for _, e := range entries {
 		rule := map[string]interface{}{
+			// Match on what the user actually types: type: webservice
 			"if": map[string]interface{}{
 				"properties": map[string]interface{}{
-					"type": map[string]interface{}{"const": name},
+					"type": map[string]interface{}{"const": e.typeName},
 				},
 			},
+			// Route to the correct schema file for that component type
 			"then": map[string]interface{}{
 				"properties": map[string]interface{}{
 					"properties": map[string]interface{}{
-						"$ref": fmt.Sprintf("%s-schema.json", name),
+						"$ref": e.fileName,
 					},
 				},
 			},
