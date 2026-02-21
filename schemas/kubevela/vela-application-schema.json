@@ -1,24 +1,65 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
+  "description": "Defines a KubeVela Application resource (OAM Application). Schemas generated from live cluster.",
   "properties": {
     "apiVersion": {
-      "const": "core.oam.dev/v1beta1"
+      "const": "core.oam.dev/v1beta1",
+      "description": "Must be 'core.oam.dev/v1beta1'.",
+      "type": "string"
     },
     "kind": {
-      "const": "Application"
+      "const": "Application",
+      "description": "Must be 'Application'. Other OAM kinds (ComponentDefinition, TraitDefinition) are for platform operators.",
+      "type": "string"
+    },
+    "metadata": {
+      "description": "Standard Kubernetes object metadata.",
+      "properties": {
+        "annotations": {
+          "additionalProperties": {
+            "type": "string"
+          },
+          "description": "Key-value annotations attached to this Application resource.",
+          "type": "object"
+        },
+        "labels": {
+          "additionalProperties": {
+            "type": "string"
+          },
+          "description": "Key-value labels attached to this Application resource.",
+          "type": "object"
+        },
+        "name": {
+          "description": "The application name. Used as the Kubernetes resource name.",
+          "type": "string"
+        },
+        "namespace": {
+          "description": "Kubernetes namespace to deploy into. Defaults to the cluster default.",
+          "type": "string"
+        }
+      },
+      "required": [
+        "name"
+      ],
+      "type": "object"
     },
     "spec": {
+      "description": "The desired state of the Application.",
       "properties": {
         "components": {
+          "description": "The list of workload components that make up this application.",
           "items": {
-            "oneOf": [
+            "allOf": [
               {
                 "if": {
                   "properties": {
                     "type": {
                       "const": "cron-task"
                     }
-                  }
+                  },
+                  "required": [
+                    "type"
+                  ]
                 },
                 "then": {
                   "properties": {
@@ -32,25 +73,12 @@
                 "if": {
                   "properties": {
                     "type": {
-                      "const": "cron-task-v1"
-                    }
-                  }
-                },
-                "then": {
-                  "properties": {
-                    "properties": {
-                      "$ref": "component-schema-cron-task-v1-schema.json"
-                    }
-                  }
-                }
-              },
-              {
-                "if": {
-                  "properties": {
-                    "type": {
                       "const": "daemon"
                     }
-                  }
+                  },
+                  "required": [
+                    "type"
+                  ]
                 },
                 "then": {
                   "properties": {
@@ -64,25 +92,12 @@
                 "if": {
                   "properties": {
                     "type": {
-                      "const": "daemon-v1"
-                    }
-                  }
-                },
-                "then": {
-                  "properties": {
-                    "properties": {
-                      "$ref": "component-schema-daemon-v1-schema.json"
-                    }
-                  }
-                }
-              },
-              {
-                "if": {
-                  "properties": {
-                    "type": {
                       "const": "k8s-objects"
                     }
-                  }
+                  },
+                  "required": [
+                    "type"
+                  ]
                 },
                 "then": {
                   "properties": {
@@ -96,25 +111,12 @@
                 "if": {
                   "properties": {
                     "type": {
-                      "const": "k8s-objects-v1"
-                    }
-                  }
-                },
-                "then": {
-                  "properties": {
-                    "properties": {
-                      "$ref": "component-schema-k8s-objects-v1-schema.json"
-                    }
-                  }
-                }
-              },
-              {
-                "if": {
-                  "properties": {
-                    "type": {
                       "const": "raw"
                     }
-                  }
+                  },
+                  "required": [
+                    "type"
+                  ]
                 },
                 "then": {
                   "properties": {
@@ -128,25 +130,12 @@
                 "if": {
                   "properties": {
                     "type": {
-                      "const": "raw-v1"
-                    }
-                  }
-                },
-                "then": {
-                  "properties": {
-                    "properties": {
-                      "$ref": "component-schema-raw-v1-schema.json"
-                    }
-                  }
-                }
-              },
-              {
-                "if": {
-                  "properties": {
-                    "type": {
                       "const": "ref-objects"
                     }
-                  }
+                  },
+                  "required": [
+                    "type"
+                  ]
                 },
                 "then": {
                   "properties": {
@@ -160,25 +149,12 @@
                 "if": {
                   "properties": {
                     "type": {
-                      "const": "ref-objects-v1"
-                    }
-                  }
-                },
-                "then": {
-                  "properties": {
-                    "properties": {
-                      "$ref": "component-schema-ref-objects-v1-schema.json"
-                    }
-                  }
-                }
-              },
-              {
-                "if": {
-                  "properties": {
-                    "type": {
                       "const": "statefulset"
                     }
-                  }
+                  },
+                  "required": [
+                    "type"
+                  ]
                 },
                 "then": {
                   "properties": {
@@ -192,25 +168,12 @@
                 "if": {
                   "properties": {
                     "type": {
-                      "const": "statefulset-v1"
-                    }
-                  }
-                },
-                "then": {
-                  "properties": {
-                    "properties": {
-                      "$ref": "component-schema-statefulset-v1-schema.json"
-                    }
-                  }
-                }
-              },
-              {
-                "if": {
-                  "properties": {
-                    "type": {
                       "const": "task"
                     }
-                  }
+                  },
+                  "required": [
+                    "type"
+                  ]
                 },
                 "then": {
                   "properties": {
@@ -224,25 +187,12 @@
                 "if": {
                   "properties": {
                     "type": {
-                      "const": "task-v1"
-                    }
-                  }
-                },
-                "then": {
-                  "properties": {
-                    "properties": {
-                      "$ref": "component-schema-task-v1-schema.json"
-                    }
-                  }
-                }
-              },
-              {
-                "if": {
-                  "properties": {
-                    "type": {
                       "const": "webservice"
                     }
-                  }
+                  },
+                  "required": [
+                    "type"
+                  ]
                 },
                 "then": {
                   "properties": {
@@ -256,25 +206,12 @@
                 "if": {
                   "properties": {
                     "type": {
-                      "const": "webservice-v1"
-                    }
-                  }
-                },
-                "then": {
-                  "properties": {
-                    "properties": {
-                      "$ref": "component-schema-webservice-v1-schema.json"
-                    }
-                  }
-                }
-              },
-              {
-                "if": {
-                  "properties": {
-                    "type": {
                       "const": "worker"
                     }
-                  }
+                  },
+                  "required": [
+                    "type"
+                  ]
                 },
                 "then": {
                   "properties": {
@@ -283,30 +220,792 @@
                     }
                   }
                 }
-              },
-              {
-                "if": {
-                  "properties": {
-                    "type": {
-                      "const": "worker-v1"
-                    }
-                  }
+              }
+            ],
+            "description": "A single workload component of the application.",
+            "properties": {
+              "dependsOn": {
+                "description": "Names of other components in the same application that must be deployed first.",
+                "items": {
+                  "type": "string"
                 },
-                "then": {
+                "type": "array"
+              },
+              "externalRevision": {
+                "description": "Pin to a specific component revision by name.",
+                "type": "string"
+              },
+              "name": {
+                "description": "A unique name for this component instance within the application.",
+                "type": "string"
+              },
+              "properties": {
+                "description": "Component-specific properties. Set 'type' first, then Ctrl+Space here for field hints.",
+                "type": "object"
+              },
+              "traits": {
+                "description": "Operational traits to attach to this component (ingress, scaler, resource limits, etc.).",
+                "items": {
+                  "allOf": [
+                    {
+                      "if": {
+                        "properties": {
+                          "type": {
+                            "const": "affinity"
+                          }
+                        },
+                        "required": [
+                          "type"
+                        ]
+                      },
+                      "then": {
+                        "properties": {
+                          "properties": {
+                            "$ref": "trait-schema-affinity-schema.json"
+                          }
+                        }
+                      }
+                    },
+                    {
+                      "if": {
+                        "properties": {
+                          "type": {
+                            "const": "annotations"
+                          }
+                        },
+                        "required": [
+                          "type"
+                        ]
+                      },
+                      "then": {
+                        "properties": {
+                          "properties": {
+                            "$ref": "trait-schema-annotations-schema.json"
+                          }
+                        }
+                      }
+                    },
+                    {
+                      "if": {
+                        "properties": {
+                          "type": {
+                            "const": "command"
+                          }
+                        },
+                        "required": [
+                          "type"
+                        ]
+                      },
+                      "then": {
+                        "properties": {
+                          "properties": {
+                            "$ref": "trait-schema-command-schema.json"
+                          }
+                        }
+                      }
+                    },
+                    {
+                      "if": {
+                        "properties": {
+                          "type": {
+                            "const": "configmap"
+                          }
+                        },
+                        "required": [
+                          "type"
+                        ]
+                      },
+                      "then": {
+                        "properties": {
+                          "properties": {
+                            "$ref": "trait-schema-configmap-schema.json"
+                          }
+                        }
+                      }
+                    },
+                    {
+                      "if": {
+                        "properties": {
+                          "type": {
+                            "const": "container-image"
+                          }
+                        },
+                        "required": [
+                          "type"
+                        ]
+                      },
+                      "then": {
+                        "properties": {
+                          "properties": {
+                            "$ref": "trait-schema-container-image-schema.json"
+                          }
+                        }
+                      }
+                    },
+                    {
+                      "if": {
+                        "properties": {
+                          "type": {
+                            "const": "container-ports"
+                          }
+                        },
+                        "required": [
+                          "type"
+                        ]
+                      },
+                      "then": {
+                        "properties": {
+                          "properties": {
+                            "$ref": "trait-schema-container-ports-schema.json"
+                          }
+                        }
+                      }
+                    },
+                    {
+                      "if": {
+                        "properties": {
+                          "type": {
+                            "const": "cpuscaler"
+                          }
+                        },
+                        "required": [
+                          "type"
+                        ]
+                      },
+                      "then": {
+                        "properties": {
+                          "properties": {
+                            "$ref": "trait-schema-cpuscaler-schema.json"
+                          }
+                        }
+                      }
+                    },
+                    {
+                      "if": {
+                        "properties": {
+                          "type": {
+                            "const": "env"
+                          }
+                        },
+                        "required": [
+                          "type"
+                        ]
+                      },
+                      "then": {
+                        "properties": {
+                          "properties": {
+                            "$ref": "trait-schema-env-schema.json"
+                          }
+                        }
+                      }
+                    },
+                    {
+                      "if": {
+                        "properties": {
+                          "type": {
+                            "const": "expose"
+                          }
+                        },
+                        "required": [
+                          "type"
+                        ]
+                      },
+                      "then": {
+                        "properties": {
+                          "properties": {
+                            "$ref": "trait-schema-expose-schema.json"
+                          }
+                        }
+                      }
+                    },
+                    {
+                      "if": {
+                        "properties": {
+                          "type": {
+                            "const": "gateway"
+                          }
+                        },
+                        "required": [
+                          "type"
+                        ]
+                      },
+                      "then": {
+                        "properties": {
+                          "properties": {
+                            "$ref": "trait-schema-gateway-schema.json"
+                          }
+                        }
+                      }
+                    },
+                    {
+                      "if": {
+                        "properties": {
+                          "type": {
+                            "const": "hostalias"
+                          }
+                        },
+                        "required": [
+                          "type"
+                        ]
+                      },
+                      "then": {
+                        "properties": {
+                          "properties": {
+                            "$ref": "trait-schema-hostalias-schema.json"
+                          }
+                        }
+                      }
+                    },
+                    {
+                      "if": {
+                        "properties": {
+                          "type": {
+                            "const": "hpa"
+                          }
+                        },
+                        "required": [
+                          "type"
+                        ]
+                      },
+                      "then": {
+                        "properties": {
+                          "properties": {
+                            "$ref": "trait-schema-hpa-schema.json"
+                          }
+                        }
+                      }
+                    },
+                    {
+                      "if": {
+                        "properties": {
+                          "type": {
+                            "const": "ingress"
+                          }
+                        },
+                        "required": [
+                          "type"
+                        ]
+                      },
+                      "then": {
+                        "properties": {
+                          "properties": {
+                            "$ref": "trait-schema-ingress-schema.json"
+                          }
+                        }
+                      }
+                    },
+                    {
+                      "if": {
+                        "properties": {
+                          "type": {
+                            "const": "ingress-1-20"
+                          }
+                        },
+                        "required": [
+                          "type"
+                        ]
+                      },
+                      "then": {
+                        "properties": {
+                          "properties": {
+                            "$ref": "trait-schema-ingress-1-20-schema.json"
+                          }
+                        }
+                      }
+                    },
+                    {
+                      "if": {
+                        "properties": {
+                          "type": {
+                            "const": "init-container"
+                          }
+                        },
+                        "required": [
+                          "type"
+                        ]
+                      },
+                      "then": {
+                        "properties": {
+                          "properties": {
+                            "$ref": "trait-schema-init-container-schema.json"
+                          }
+                        }
+                      }
+                    },
+                    {
+                      "if": {
+                        "properties": {
+                          "type": {
+                            "const": "json-merge-patch"
+                          }
+                        },
+                        "required": [
+                          "type"
+                        ]
+                      },
+                      "then": {
+                        "properties": {
+                          "properties": {
+                            "$ref": "trait-schema-json-merge-patch-schema.json"
+                          }
+                        }
+                      }
+                    },
+                    {
+                      "if": {
+                        "properties": {
+                          "type": {
+                            "const": "json-patch"
+                          }
+                        },
+                        "required": [
+                          "type"
+                        ]
+                      },
+                      "then": {
+                        "properties": {
+                          "properties": {
+                            "$ref": "trait-schema-json-patch-schema.json"
+                          }
+                        }
+                      }
+                    },
+                    {
+                      "if": {
+                        "properties": {
+                          "type": {
+                            "const": "k8s-update-strategy"
+                          }
+                        },
+                        "required": [
+                          "type"
+                        ]
+                      },
+                      "then": {
+                        "properties": {
+                          "properties": {
+                            "$ref": "trait-schema-k8s-update-strategy-schema.json"
+                          }
+                        }
+                      }
+                    },
+                    {
+                      "if": {
+                        "properties": {
+                          "type": {
+                            "const": "labels"
+                          }
+                        },
+                        "required": [
+                          "type"
+                        ]
+                      },
+                      "then": {
+                        "properties": {
+                          "properties": {
+                            "$ref": "trait-schema-labels-schema.json"
+                          }
+                        }
+                      }
+                    },
+                    {
+                      "if": {
+                        "properties": {
+                          "type": {
+                            "const": "lifecycle"
+                          }
+                        },
+                        "required": [
+                          "type"
+                        ]
+                      },
+                      "then": {
+                        "properties": {
+                          "properties": {
+                            "$ref": "trait-schema-lifecycle-schema.json"
+                          }
+                        }
+                      }
+                    },
+                    {
+                      "if": {
+                        "properties": {
+                          "type": {
+                            "const": "nocalhost"
+                          }
+                        },
+                        "required": [
+                          "type"
+                        ]
+                      },
+                      "then": {
+                        "properties": {
+                          "properties": {
+                            "$ref": "trait-schema-nocalhost-schema.json"
+                          }
+                        }
+                      }
+                    },
+                    {
+                      "if": {
+                        "properties": {
+                          "type": {
+                            "const": "node-affinity"
+                          }
+                        },
+                        "required": [
+                          "type"
+                        ]
+                      },
+                      "then": {
+                        "properties": {
+                          "properties": {
+                            "$ref": "trait-schema-node-affinity-schema.json"
+                          }
+                        }
+                      }
+                    },
+                    {
+                      "if": {
+                        "properties": {
+                          "type": {
+                            "const": "podsecuritycontext"
+                          }
+                        },
+                        "required": [
+                          "type"
+                        ]
+                      },
+                      "then": {
+                        "properties": {
+                          "properties": {
+                            "$ref": "trait-schema-podsecuritycontext-schema.json"
+                          }
+                        }
+                      }
+                    },
+                    {
+                      "if": {
+                        "properties": {
+                          "type": {
+                            "const": "pure-ingress"
+                          }
+                        },
+                        "required": [
+                          "type"
+                        ]
+                      },
+                      "then": {
+                        "properties": {
+                          "properties": {
+                            "$ref": "trait-schema-pure-ingress-schema.json"
+                          }
+                        }
+                      }
+                    },
+                    {
+                      "if": {
+                        "properties": {
+                          "type": {
+                            "const": "pvc"
+                          }
+                        },
+                        "required": [
+                          "type"
+                        ]
+                      },
+                      "then": {
+                        "properties": {
+                          "properties": {
+                            "$ref": "trait-schema-pvc-schema.json"
+                          }
+                        }
+                      }
+                    },
+                    {
+                      "if": {
+                        "properties": {
+                          "type": {
+                            "const": "resource"
+                          }
+                        },
+                        "required": [
+                          "type"
+                        ]
+                      },
+                      "then": {
+                        "properties": {
+                          "properties": {
+                            "$ref": "trait-schema-resource-schema.json"
+                          }
+                        }
+                      }
+                    },
+                    {
+                      "if": {
+                        "properties": {
+                          "type": {
+                            "const": "scaler"
+                          }
+                        },
+                        "required": [
+                          "type"
+                        ]
+                      },
+                      "then": {
+                        "properties": {
+                          "properties": {
+                            "$ref": "trait-schema-scaler-schema.json"
+                          }
+                        }
+                      }
+                    },
+                    {
+                      "if": {
+                        "properties": {
+                          "type": {
+                            "const": "securitycontext"
+                          }
+                        },
+                        "required": [
+                          "type"
+                        ]
+                      },
+                      "then": {
+                        "properties": {
+                          "properties": {
+                            "$ref": "trait-schema-securitycontext-schema.json"
+                          }
+                        }
+                      }
+                    },
+                    {
+                      "if": {
+                        "properties": {
+                          "type": {
+                            "const": "service-account"
+                          }
+                        },
+                        "required": [
+                          "type"
+                        ]
+                      },
+                      "then": {
+                        "properties": {
+                          "properties": {
+                            "$ref": "trait-schema-service-account-schema.json"
+                          }
+                        }
+                      }
+                    },
+                    {
+                      "if": {
+                        "properties": {
+                          "type": {
+                            "const": "service-binding"
+                          }
+                        },
+                        "required": [
+                          "type"
+                        ]
+                      },
+                      "then": {
+                        "properties": {
+                          "properties": {
+                            "$ref": "trait-schema-service-binding-schema.json"
+                          }
+                        }
+                      }
+                    },
+                    {
+                      "if": {
+                        "properties": {
+                          "type": {
+                            "const": "sidecar"
+                          }
+                        },
+                        "required": [
+                          "type"
+                        ]
+                      },
+                      "then": {
+                        "properties": {
+                          "properties": {
+                            "$ref": "trait-schema-sidecar-schema.json"
+                          }
+                        }
+                      }
+                    },
+                    {
+                      "if": {
+                        "properties": {
+                          "type": {
+                            "const": "startup-probe"
+                          }
+                        },
+                        "required": [
+                          "type"
+                        ]
+                      },
+                      "then": {
+                        "properties": {
+                          "properties": {
+                            "$ref": "trait-schema-startup-probe-schema.json"
+                          }
+                        }
+                      }
+                    },
+                    {
+                      "if": {
+                        "properties": {
+                          "type": {
+                            "const": "storage"
+                          }
+                        },
+                        "required": [
+                          "type"
+                        ]
+                      },
+                      "then": {
+                        "properties": {
+                          "properties": {
+                            "$ref": "trait-schema-storage-schema.json"
+                          }
+                        }
+                      }
+                    },
+                    {
+                      "if": {
+                        "properties": {
+                          "type": {
+                            "const": "topologyspreadconstraints"
+                          }
+                        },
+                        "required": [
+                          "type"
+                        ]
+                      },
+                      "then": {
+                        "properties": {
+                          "properties": {
+                            "$ref": "trait-schema-topologyspreadconstraints-schema.json"
+                          }
+                        }
+                      }
+                    },
+                    {
+                      "if": {
+                        "properties": {
+                          "type": {
+                            "const": "volumes"
+                          }
+                        },
+                        "required": [
+                          "type"
+                        ]
+                      },
+                      "then": {
+                        "properties": {
+                          "properties": {
+                            "$ref": "trait-schema-volumes-schema.json"
+                          }
+                        }
+                      }
+                    }
+                  ],
+                  "description": "An operational capability attached to a component (e.g. ingress, scaler, resource limits).",
                   "properties": {
                     "properties": {
-                      "$ref": "component-schema-worker-v1-schema.json"
+                      "description": "Trait-specific properties. Set 'type' first, then use Ctrl+Space here.",
+                      "type": "object"
+                    },
+                    "type": {
+                      "description": "The trait definition type. Controls which 'properties' are valid.",
+                      "enum": [
+                        "affinity",
+                        "annotations",
+                        "command",
+                        "configmap",
+                        "container-image",
+                        "container-ports",
+                        "cpuscaler",
+                        "env",
+                        "expose",
+                        "gateway",
+                        "hostalias",
+                        "hpa",
+                        "ingress",
+                        "ingress-1-20",
+                        "init-container",
+                        "json-merge-patch",
+                        "json-patch",
+                        "k8s-update-strategy",
+                        "labels",
+                        "lifecycle",
+                        "nocalhost",
+                        "node-affinity",
+                        "podsecuritycontext",
+                        "pure-ingress",
+                        "pvc",
+                        "resource",
+                        "scaler",
+                        "securitycontext",
+                        "service-account",
+                        "service-binding",
+                        "sidecar",
+                        "startup-probe",
+                        "storage",
+                        "topologyspreadconstraints",
+                        "volumes"
+                      ],
+                      "type": "string"
                     }
-                  }
-                }
+                  },
+                  "required": [
+                    "type"
+                  ],
+                  "type": "object"
+                },
+                "type": "array"
               },
+              "type": {
+                "description": "The component definition type. Controls which 'properties' are valid. Use Ctrl+Space to see all options.",
+                "enum": [
+                  "cron-task",
+                  "daemon",
+                  "k8s-objects",
+                  "raw",
+                  "ref-objects",
+                  "statefulset",
+                  "task",
+                  "webservice",
+                  "worker"
+                ],
+                "type": "string"
+              }
+            },
+            "required": [
+              "name",
+              "type"
+            ],
+            "type": "object"
+          },
+          "type": "array"
+        },
+        "policies": {
+          "description": "Application-level policies such as topology, override, garbage-collect.",
+          "items": {
+            "allOf": [
               {
                 "if": {
                   "properties": {
                     "type": {
                       "const": "apply-once"
                     }
-                  }
+                  },
+                  "required": [
+                    "type"
+                  ]
                 },
                 "then": {
                   "properties": {
@@ -320,25 +1019,12 @@
                 "if": {
                   "properties": {
                     "type": {
-                      "const": "apply-once-v1"
-                    }
-                  }
-                },
-                "then": {
-                  "properties": {
-                    "properties": {
-                      "$ref": "policy-schema-apply-once-v1-schema.json"
-                    }
-                  }
-                }
-              },
-              {
-                "if": {
-                  "properties": {
-                    "type": {
                       "const": "envbinding"
                     }
-                  }
+                  },
+                  "required": [
+                    "type"
+                  ]
                 },
                 "then": {
                   "properties": {
@@ -352,25 +1038,12 @@
                 "if": {
                   "properties": {
                     "type": {
-                      "const": "envbinding-v1"
-                    }
-                  }
-                },
-                "then": {
-                  "properties": {
-                    "properties": {
-                      "$ref": "policy-schema-envbinding-v1-schema.json"
-                    }
-                  }
-                }
-              },
-              {
-                "if": {
-                  "properties": {
-                    "type": {
                       "const": "garbage-collect"
                     }
-                  }
+                  },
+                  "required": [
+                    "type"
+                  ]
                 },
                 "then": {
                   "properties": {
@@ -384,25 +1057,12 @@
                 "if": {
                   "properties": {
                     "type": {
-                      "const": "garbage-collect-v1"
-                    }
-                  }
-                },
-                "then": {
-                  "properties": {
-                    "properties": {
-                      "$ref": "policy-schema-garbage-collect-v1-schema.json"
-                    }
-                  }
-                }
-              },
-              {
-                "if": {
-                  "properties": {
-                    "type": {
                       "const": "override"
                     }
-                  }
+                  },
+                  "required": [
+                    "type"
+                  ]
                 },
                 "then": {
                   "properties": {
@@ -416,25 +1076,12 @@
                 "if": {
                   "properties": {
                     "type": {
-                      "const": "override-v1"
-                    }
-                  }
-                },
-                "then": {
-                  "properties": {
-                    "properties": {
-                      "$ref": "policy-schema-override-v1-schema.json"
-                    }
-                  }
-                }
-              },
-              {
-                "if": {
-                  "properties": {
-                    "type": {
                       "const": "read-only"
                     }
-                  }
+                  },
+                  "required": [
+                    "type"
+                  ]
                 },
                 "then": {
                   "properties": {
@@ -448,25 +1095,12 @@
                 "if": {
                   "properties": {
                     "type": {
-                      "const": "read-only-v1"
-                    }
-                  }
-                },
-                "then": {
-                  "properties": {
-                    "properties": {
-                      "$ref": "policy-schema-read-only-v1-schema.json"
-                    }
-                  }
-                }
-              },
-              {
-                "if": {
-                  "properties": {
-                    "type": {
                       "const": "replication"
                     }
-                  }
+                  },
+                  "required": [
+                    "type"
+                  ]
                 },
                 "then": {
                   "properties": {
@@ -480,25 +1114,12 @@
                 "if": {
                   "properties": {
                     "type": {
-                      "const": "replication-v1"
-                    }
-                  }
-                },
-                "then": {
-                  "properties": {
-                    "properties": {
-                      "$ref": "policy-schema-replication-v1-schema.json"
-                    }
-                  }
-                }
-              },
-              {
-                "if": {
-                  "properties": {
-                    "type": {
                       "const": "resource-update"
                     }
-                  }
+                  },
+                  "required": [
+                    "type"
+                  ]
                 },
                 "then": {
                   "properties": {
@@ -512,25 +1133,12 @@
                 "if": {
                   "properties": {
                     "type": {
-                      "const": "resource-update-v1"
-                    }
-                  }
-                },
-                "then": {
-                  "properties": {
-                    "properties": {
-                      "$ref": "policy-schema-resource-update-v1-schema.json"
-                    }
-                  }
-                }
-              },
-              {
-                "if": {
-                  "properties": {
-                    "type": {
                       "const": "shared-resource"
                     }
-                  }
+                  },
+                  "required": [
+                    "type"
+                  ]
                 },
                 "then": {
                   "properties": {
@@ -544,25 +1152,12 @@
                 "if": {
                   "properties": {
                     "type": {
-                      "const": "shared-resource-v1"
-                    }
-                  }
-                },
-                "then": {
-                  "properties": {
-                    "properties": {
-                      "$ref": "policy-schema-shared-resource-v1-schema.json"
-                    }
-                  }
-                }
-              },
-              {
-                "if": {
-                  "properties": {
-                    "type": {
                       "const": "take-over"
                     }
-                  }
+                  },
+                  "required": [
+                    "type"
+                  ]
                 },
                 "then": {
                   "properties": {
@@ -576,25 +1171,12 @@
                 "if": {
                   "properties": {
                     "type": {
-                      "const": "take-over-v1"
-                    }
-                  }
-                },
-                "then": {
-                  "properties": {
-                    "properties": {
-                      "$ref": "policy-schema-take-over-v1-schema.json"
-                    }
-                  }
-                }
-              },
-              {
-                "if": {
-                  "properties": {
-                    "type": {
                       "const": "topology"
                     }
-                  }
+                  },
+                  "required": [
+                    "type"
+                  ]
                 },
                 "then": {
                   "properties": {
@@ -603,2237 +1185,814 @@
                     }
                   }
                 }
-              },
-              {
-                "if": {
-                  "properties": {
-                    "type": {
-                      "const": "topology-v1"
-                    }
-                  }
-                },
-                "then": {
-                  "properties": {
-                    "properties": {
-                      "$ref": "policy-schema-topology-v1-schema.json"
-                    }
-                  }
-                }
-              },
-              {
-                "if": {
-                  "properties": {
-                    "type": {
-                      "const": "affinity"
-                    }
-                  }
-                },
-                "then": {
-                  "properties": {
-                    "properties": {
-                      "$ref": "trait-schema-affinity-schema.json"
-                    }
-                  }
-                }
-              },
-              {
-                "if": {
-                  "properties": {
-                    "type": {
-                      "const": "affinity-v1"
-                    }
-                  }
-                },
-                "then": {
-                  "properties": {
-                    "properties": {
-                      "$ref": "trait-schema-affinity-v1-schema.json"
-                    }
-                  }
-                }
-              },
-              {
-                "if": {
-                  "properties": {
-                    "type": {
-                      "const": "annotations"
-                    }
-                  }
-                },
-                "then": {
-                  "properties": {
-                    "properties": {
-                      "$ref": "trait-schema-annotations-schema.json"
-                    }
-                  }
-                }
-              },
-              {
-                "if": {
-                  "properties": {
-                    "type": {
-                      "const": "annotations-v1"
-                    }
-                  }
-                },
-                "then": {
-                  "properties": {
-                    "properties": {
-                      "$ref": "trait-schema-annotations-v1-schema.json"
-                    }
-                  }
-                }
-              },
-              {
-                "if": {
-                  "properties": {
-                    "type": {
-                      "const": "command"
-                    }
-                  }
-                },
-                "then": {
-                  "properties": {
-                    "properties": {
-                      "$ref": "trait-schema-command-schema.json"
-                    }
-                  }
-                }
-              },
-              {
-                "if": {
-                  "properties": {
-                    "type": {
-                      "const": "command-v1"
-                    }
-                  }
-                },
-                "then": {
-                  "properties": {
-                    "properties": {
-                      "$ref": "trait-schema-command-v1-schema.json"
-                    }
-                  }
-                }
-              },
-              {
-                "if": {
-                  "properties": {
-                    "type": {
-                      "const": "configmap"
-                    }
-                  }
-                },
-                "then": {
-                  "properties": {
-                    "properties": {
-                      "$ref": "trait-schema-configmap-schema.json"
-                    }
-                  }
-                }
-              },
-              {
-                "if": {
-                  "properties": {
-                    "type": {
-                      "const": "configmap-v1"
-                    }
-                  }
-                },
-                "then": {
-                  "properties": {
-                    "properties": {
-                      "$ref": "trait-schema-configmap-v1-schema.json"
-                    }
-                  }
-                }
-              },
-              {
-                "if": {
-                  "properties": {
-                    "type": {
-                      "const": "container-image"
-                    }
-                  }
-                },
-                "then": {
-                  "properties": {
-                    "properties": {
-                      "$ref": "trait-schema-container-image-schema.json"
-                    }
-                  }
-                }
-              },
-              {
-                "if": {
-                  "properties": {
-                    "type": {
-                      "const": "container-image-v1"
-                    }
-                  }
-                },
-                "then": {
-                  "properties": {
-                    "properties": {
-                      "$ref": "trait-schema-container-image-v1-schema.json"
-                    }
-                  }
-                }
-              },
-              {
-                "if": {
-                  "properties": {
-                    "type": {
-                      "const": "container-ports"
-                    }
-                  }
-                },
-                "then": {
-                  "properties": {
-                    "properties": {
-                      "$ref": "trait-schema-container-ports-schema.json"
-                    }
-                  }
-                }
-              },
-              {
-                "if": {
-                  "properties": {
-                    "type": {
-                      "const": "container-ports-v1"
-                    }
-                  }
-                },
-                "then": {
-                  "properties": {
-                    "properties": {
-                      "$ref": "trait-schema-container-ports-v1-schema.json"
-                    }
-                  }
-                }
-              },
-              {
-                "if": {
-                  "properties": {
-                    "type": {
-                      "const": "cpuscaler"
-                    }
-                  }
-                },
-                "then": {
-                  "properties": {
-                    "properties": {
-                      "$ref": "trait-schema-cpuscaler-schema.json"
-                    }
-                  }
-                }
-              },
-              {
-                "if": {
-                  "properties": {
-                    "type": {
-                      "const": "cpuscaler-v1"
-                    }
-                  }
-                },
-                "then": {
-                  "properties": {
-                    "properties": {
-                      "$ref": "trait-schema-cpuscaler-v1-schema.json"
-                    }
-                  }
-                }
-              },
-              {
-                "if": {
-                  "properties": {
-                    "type": {
-                      "const": "env"
-                    }
-                  }
-                },
-                "then": {
-                  "properties": {
-                    "properties": {
-                      "$ref": "trait-schema-env-schema.json"
-                    }
-                  }
-                }
-              },
-              {
-                "if": {
-                  "properties": {
-                    "type": {
-                      "const": "env-v1"
-                    }
-                  }
-                },
-                "then": {
-                  "properties": {
-                    "properties": {
-                      "$ref": "trait-schema-env-v1-schema.json"
-                    }
-                  }
-                }
-              },
-              {
-                "if": {
-                  "properties": {
-                    "type": {
-                      "const": "expose"
-                    }
-                  }
-                },
-                "then": {
-                  "properties": {
-                    "properties": {
-                      "$ref": "trait-schema-expose-schema.json"
-                    }
-                  }
-                }
-              },
-              {
-                "if": {
-                  "properties": {
-                    "type": {
-                      "const": "expose-v1"
-                    }
-                  }
-                },
-                "then": {
-                  "properties": {
-                    "properties": {
-                      "$ref": "trait-schema-expose-v1-schema.json"
-                    }
-                  }
-                }
-              },
-              {
-                "if": {
-                  "properties": {
-                    "type": {
-                      "const": "gateway"
-                    }
-                  }
-                },
-                "then": {
-                  "properties": {
-                    "properties": {
-                      "$ref": "trait-schema-gateway-schema.json"
-                    }
-                  }
-                }
-              },
-              {
-                "if": {
-                  "properties": {
-                    "type": {
-                      "const": "gateway-v1"
-                    }
-                  }
-                },
-                "then": {
-                  "properties": {
-                    "properties": {
-                      "$ref": "trait-schema-gateway-v1-schema.json"
-                    }
-                  }
-                }
-              },
-              {
-                "if": {
-                  "properties": {
-                    "type": {
-                      "const": "hostalias"
-                    }
-                  }
-                },
-                "then": {
-                  "properties": {
-                    "properties": {
-                      "$ref": "trait-schema-hostalias-schema.json"
-                    }
-                  }
-                }
-              },
-              {
-                "if": {
-                  "properties": {
-                    "type": {
-                      "const": "hostalias-v1"
-                    }
-                  }
-                },
-                "then": {
-                  "properties": {
-                    "properties": {
-                      "$ref": "trait-schema-hostalias-v1-schema.json"
-                    }
-                  }
-                }
-              },
-              {
-                "if": {
-                  "properties": {
-                    "type": {
-                      "const": "hpa"
-                    }
-                  }
-                },
-                "then": {
-                  "properties": {
-                    "properties": {
-                      "$ref": "trait-schema-hpa-schema.json"
-                    }
-                  }
-                }
-              },
-              {
-                "if": {
-                  "properties": {
-                    "type": {
-                      "const": "hpa-v1"
-                    }
-                  }
-                },
-                "then": {
-                  "properties": {
-                    "properties": {
-                      "$ref": "trait-schema-hpa-v1-schema.json"
-                    }
-                  }
-                }
-              },
-              {
-                "if": {
-                  "properties": {
-                    "type": {
-                      "const": "ingress"
-                    }
-                  }
-                },
-                "then": {
-                  "properties": {
-                    "properties": {
-                      "$ref": "trait-schema-ingress-schema.json"
-                    }
-                  }
-                }
-              },
-              {
-                "if": {
-                  "properties": {
-                    "type": {
-                      "const": "ingress-1-20"
-                    }
-                  }
-                },
-                "then": {
-                  "properties": {
-                    "properties": {
-                      "$ref": "trait-schema-ingress-1-20-schema.json"
-                    }
-                  }
-                }
-              },
-              {
-                "if": {
-                  "properties": {
-                    "type": {
-                      "const": "ingress-1-20-v1"
-                    }
-                  }
-                },
-                "then": {
-                  "properties": {
-                    "properties": {
-                      "$ref": "trait-schema-ingress-1-20-v1-schema.json"
-                    }
-                  }
-                }
-              },
-              {
-                "if": {
-                  "properties": {
-                    "type": {
-                      "const": "ingress-v1"
-                    }
-                  }
-                },
-                "then": {
-                  "properties": {
-                    "properties": {
-                      "$ref": "trait-schema-ingress-v1-schema.json"
-                    }
-                  }
-                }
-              },
-              {
-                "if": {
-                  "properties": {
-                    "type": {
-                      "const": "init-container"
-                    }
-                  }
-                },
-                "then": {
-                  "properties": {
-                    "properties": {
-                      "$ref": "trait-schema-init-container-schema.json"
-                    }
-                  }
-                }
-              },
-              {
-                "if": {
-                  "properties": {
-                    "type": {
-                      "const": "init-container-v1"
-                    }
-                  }
-                },
-                "then": {
-                  "properties": {
-                    "properties": {
-                      "$ref": "trait-schema-init-container-v1-schema.json"
-                    }
-                  }
-                }
-              },
-              {
-                "if": {
-                  "properties": {
-                    "type": {
-                      "const": "json-merge-patch"
-                    }
-                  }
-                },
-                "then": {
-                  "properties": {
-                    "properties": {
-                      "$ref": "trait-schema-json-merge-patch-schema.json"
-                    }
-                  }
-                }
-              },
-              {
-                "if": {
-                  "properties": {
-                    "type": {
-                      "const": "json-merge-patch-v1"
-                    }
-                  }
-                },
-                "then": {
-                  "properties": {
-                    "properties": {
-                      "$ref": "trait-schema-json-merge-patch-v1-schema.json"
-                    }
-                  }
-                }
-              },
-              {
-                "if": {
-                  "properties": {
-                    "type": {
-                      "const": "json-patch"
-                    }
-                  }
-                },
-                "then": {
-                  "properties": {
-                    "properties": {
-                      "$ref": "trait-schema-json-patch-schema.json"
-                    }
-                  }
-                }
-              },
-              {
-                "if": {
-                  "properties": {
-                    "type": {
-                      "const": "json-patch-v1"
-                    }
-                  }
-                },
-                "then": {
-                  "properties": {
-                    "properties": {
-                      "$ref": "trait-schema-json-patch-v1-schema.json"
-                    }
-                  }
-                }
-              },
-              {
-                "if": {
-                  "properties": {
-                    "type": {
-                      "const": "k8s-update-strategy"
-                    }
-                  }
-                },
-                "then": {
-                  "properties": {
-                    "properties": {
-                      "$ref": "trait-schema-k8s-update-strategy-schema.json"
-                    }
-                  }
-                }
-              },
-              {
-                "if": {
-                  "properties": {
-                    "type": {
-                      "const": "k8s-update-strategy-v1"
-                    }
-                  }
-                },
-                "then": {
-                  "properties": {
-                    "properties": {
-                      "$ref": "trait-schema-k8s-update-strategy-v1-schema.json"
-                    }
-                  }
-                }
-              },
-              {
-                "if": {
-                  "properties": {
-                    "type": {
-                      "const": "labels"
-                    }
-                  }
-                },
-                "then": {
-                  "properties": {
-                    "properties": {
-                      "$ref": "trait-schema-labels-schema.json"
-                    }
-                  }
-                }
-              },
-              {
-                "if": {
-                  "properties": {
-                    "type": {
-                      "const": "labels-v1"
-                    }
-                  }
-                },
-                "then": {
-                  "properties": {
-                    "properties": {
-                      "$ref": "trait-schema-labels-v1-schema.json"
-                    }
-                  }
-                }
-              },
-              {
-                "if": {
-                  "properties": {
-                    "type": {
-                      "const": "lifecycle"
-                    }
-                  }
-                },
-                "then": {
-                  "properties": {
-                    "properties": {
-                      "$ref": "trait-schema-lifecycle-schema.json"
-                    }
-                  }
-                }
-              },
-              {
-                "if": {
-                  "properties": {
-                    "type": {
-                      "const": "lifecycle-v1"
-                    }
-                  }
-                },
-                "then": {
-                  "properties": {
-                    "properties": {
-                      "$ref": "trait-schema-lifecycle-v1-schema.json"
-                    }
-                  }
-                }
-              },
-              {
-                "if": {
-                  "properties": {
-                    "type": {
-                      "const": "nocalhost"
-                    }
-                  }
-                },
-                "then": {
-                  "properties": {
-                    "properties": {
-                      "$ref": "trait-schema-nocalhost-schema.json"
-                    }
-                  }
-                }
-              },
-              {
-                "if": {
-                  "properties": {
-                    "type": {
-                      "const": "nocalhost-v1"
-                    }
-                  }
-                },
-                "then": {
-                  "properties": {
-                    "properties": {
-                      "$ref": "trait-schema-nocalhost-v1-schema.json"
-                    }
-                  }
-                }
-              },
-              {
-                "if": {
-                  "properties": {
-                    "type": {
-                      "const": "node-affinity"
-                    }
-                  }
-                },
-                "then": {
-                  "properties": {
-                    "properties": {
-                      "$ref": "trait-schema-node-affinity-schema.json"
-                    }
-                  }
-                }
-              },
-              {
-                "if": {
-                  "properties": {
-                    "type": {
-                      "const": "node-affinity-v1"
-                    }
-                  }
-                },
-                "then": {
-                  "properties": {
-                    "properties": {
-                      "$ref": "trait-schema-node-affinity-v1-schema.json"
-                    }
-                  }
-                }
-              },
-              {
-                "if": {
-                  "properties": {
-                    "type": {
-                      "const": "podsecuritycontext"
-                    }
-                  }
-                },
-                "then": {
-                  "properties": {
-                    "properties": {
-                      "$ref": "trait-schema-podsecuritycontext-schema.json"
-                    }
-                  }
-                }
-              },
-              {
-                "if": {
-                  "properties": {
-                    "type": {
-                      "const": "podsecuritycontext-v1"
-                    }
-                  }
-                },
-                "then": {
-                  "properties": {
-                    "properties": {
-                      "$ref": "trait-schema-podsecuritycontext-v1-schema.json"
-                    }
-                  }
-                }
-              },
-              {
-                "if": {
-                  "properties": {
-                    "type": {
-                      "const": "pure-ingress"
-                    }
-                  }
-                },
-                "then": {
-                  "properties": {
-                    "properties": {
-                      "$ref": "trait-schema-pure-ingress-schema.json"
-                    }
-                  }
-                }
-              },
-              {
-                "if": {
-                  "properties": {
-                    "type": {
-                      "const": "pure-ingress-v1"
-                    }
-                  }
-                },
-                "then": {
-                  "properties": {
-                    "properties": {
-                      "$ref": "trait-schema-pure-ingress-v1-schema.json"
-                    }
-                  }
-                }
-              },
-              {
-                "if": {
-                  "properties": {
-                    "type": {
-                      "const": "pvc"
-                    }
-                  }
-                },
-                "then": {
-                  "properties": {
-                    "properties": {
-                      "$ref": "trait-schema-pvc-schema.json"
-                    }
-                  }
-                }
-              },
-              {
-                "if": {
-                  "properties": {
-                    "type": {
-                      "const": "pvc-v1"
-                    }
-                  }
-                },
-                "then": {
-                  "properties": {
-                    "properties": {
-                      "$ref": "trait-schema-pvc-v1-schema.json"
-                    }
-                  }
-                }
-              },
-              {
-                "if": {
-                  "properties": {
-                    "type": {
-                      "const": "resource"
-                    }
-                  }
-                },
-                "then": {
-                  "properties": {
-                    "properties": {
-                      "$ref": "trait-schema-resource-schema.json"
-                    }
-                  }
-                }
-              },
-              {
-                "if": {
-                  "properties": {
-                    "type": {
-                      "const": "resource-v1"
-                    }
-                  }
-                },
-                "then": {
-                  "properties": {
-                    "properties": {
-                      "$ref": "trait-schema-resource-v1-schema.json"
-                    }
-                  }
-                }
-              },
-              {
-                "if": {
-                  "properties": {
-                    "type": {
-                      "const": "scaler"
-                    }
-                  }
-                },
-                "then": {
-                  "properties": {
-                    "properties": {
-                      "$ref": "trait-schema-scaler-schema.json"
-                    }
-                  }
-                }
-              },
-              {
-                "if": {
-                  "properties": {
-                    "type": {
-                      "const": "scaler-v1"
-                    }
-                  }
-                },
-                "then": {
-                  "properties": {
-                    "properties": {
-                      "$ref": "trait-schema-scaler-v1-schema.json"
-                    }
-                  }
-                }
-              },
-              {
-                "if": {
-                  "properties": {
-                    "type": {
-                      "const": "securitycontext"
-                    }
-                  }
-                },
-                "then": {
-                  "properties": {
-                    "properties": {
-                      "$ref": "trait-schema-securitycontext-schema.json"
-                    }
-                  }
-                }
-              },
-              {
-                "if": {
-                  "properties": {
-                    "type": {
-                      "const": "securitycontext-v1"
-                    }
-                  }
-                },
-                "then": {
-                  "properties": {
-                    "properties": {
-                      "$ref": "trait-schema-securitycontext-v1-schema.json"
-                    }
-                  }
-                }
-              },
-              {
-                "if": {
-                  "properties": {
-                    "type": {
-                      "const": "service-account"
-                    }
-                  }
-                },
-                "then": {
-                  "properties": {
-                    "properties": {
-                      "$ref": "trait-schema-service-account-schema.json"
-                    }
-                  }
-                }
-              },
-              {
-                "if": {
-                  "properties": {
-                    "type": {
-                      "const": "service-account-v1"
-                    }
-                  }
-                },
-                "then": {
-                  "properties": {
-                    "properties": {
-                      "$ref": "trait-schema-service-account-v1-schema.json"
-                    }
-                  }
-                }
-              },
-              {
-                "if": {
-                  "properties": {
-                    "type": {
-                      "const": "service-binding"
-                    }
-                  }
-                },
-                "then": {
-                  "properties": {
-                    "properties": {
-                      "$ref": "trait-schema-service-binding-schema.json"
-                    }
-                  }
-                }
-              },
-              {
-                "if": {
-                  "properties": {
-                    "type": {
-                      "const": "service-binding-v1"
-                    }
-                  }
-                },
-                "then": {
-                  "properties": {
-                    "properties": {
-                      "$ref": "trait-schema-service-binding-v1-schema.json"
-                    }
-                  }
-                }
-              },
-              {
-                "if": {
-                  "properties": {
-                    "type": {
-                      "const": "sidecar"
-                    }
-                  }
-                },
-                "then": {
-                  "properties": {
-                    "properties": {
-                      "$ref": "trait-schema-sidecar-schema.json"
-                    }
-                  }
-                }
-              },
-              {
-                "if": {
-                  "properties": {
-                    "type": {
-                      "const": "sidecar-v1"
-                    }
-                  }
-                },
-                "then": {
-                  "properties": {
-                    "properties": {
-                      "$ref": "trait-schema-sidecar-v1-schema.json"
-                    }
-                  }
-                }
-              },
-              {
-                "if": {
-                  "properties": {
-                    "type": {
-                      "const": "startup-probe"
-                    }
-                  }
-                },
-                "then": {
-                  "properties": {
-                    "properties": {
-                      "$ref": "trait-schema-startup-probe-schema.json"
-                    }
-                  }
-                }
-              },
-              {
-                "if": {
-                  "properties": {
-                    "type": {
-                      "const": "startup-probe-v1"
-                    }
-                  }
-                },
-                "then": {
-                  "properties": {
-                    "properties": {
-                      "$ref": "trait-schema-startup-probe-v1-schema.json"
-                    }
-                  }
-                }
-              },
-              {
-                "if": {
-                  "properties": {
-                    "type": {
-                      "const": "storage"
-                    }
-                  }
-                },
-                "then": {
-                  "properties": {
-                    "properties": {
-                      "$ref": "trait-schema-storage-schema.json"
-                    }
-                  }
-                }
-              },
-              {
-                "if": {
-                  "properties": {
-                    "type": {
-                      "const": "storage-v1"
-                    }
-                  }
-                },
-                "then": {
-                  "properties": {
-                    "properties": {
-                      "$ref": "trait-schema-storage-v1-schema.json"
-                    }
-                  }
-                }
-              },
-              {
-                "if": {
-                  "properties": {
-                    "type": {
-                      "const": "topologyspreadconstraints"
-                    }
-                  }
-                },
-                "then": {
-                  "properties": {
-                    "properties": {
-                      "$ref": "trait-schema-topologyspreadconstraints-schema.json"
-                    }
-                  }
-                }
-              },
-              {
-                "if": {
-                  "properties": {
-                    "type": {
-                      "const": "topologyspreadconstraints-v1"
-                    }
-                  }
-                },
-                "then": {
-                  "properties": {
-                    "properties": {
-                      "$ref": "trait-schema-topologyspreadconstraints-v1-schema.json"
-                    }
-                  }
-                }
-              },
-              {
-                "if": {
-                  "properties": {
-                    "type": {
-                      "const": "volumes"
-                    }
-                  }
-                },
-                "then": {
-                  "properties": {
-                    "properties": {
-                      "$ref": "trait-schema-volumes-schema.json"
-                    }
-                  }
-                }
-              },
-              {
-                "if": {
-                  "properties": {
-                    "type": {
-                      "const": "volumes-v1"
-                    }
-                  }
-                },
-                "then": {
-                  "properties": {
-                    "properties": {
-                      "$ref": "trait-schema-volumes-v1-schema.json"
-                    }
-                  }
-                }
-              },
-              {
-                "if": {
-                  "properties": {
-                    "type": {
-                      "const": "apply-application"
-                    }
-                  }
-                },
-                "then": {
-                  "properties": {
-                    "properties": {
-                      "$ref": "workflowstep-schema-apply-application-schema.json"
-                    }
-                  }
-                }
-              },
-              {
-                "if": {
-                  "properties": {
-                    "type": {
-                      "const": "apply-application-in-parallel"
-                    }
-                  }
-                },
-                "then": {
-                  "properties": {
-                    "properties": {
-                      "$ref": "workflowstep-schema-apply-application-in-parallel-schema.json"
-                    }
-                  }
-                }
-              },
-              {
-                "if": {
-                  "properties": {
-                    "type": {
-                      "const": "apply-application-in-parallel-v1"
-                    }
-                  }
-                },
-                "then": {
-                  "properties": {
-                    "properties": {
-                      "$ref": "workflowstep-schema-apply-application-in-parallel-v1-schema.json"
-                    }
-                  }
-                }
-              },
-              {
-                "if": {
-                  "properties": {
-                    "type": {
-                      "const": "apply-application-v1"
-                    }
-                  }
-                },
-                "then": {
-                  "properties": {
-                    "properties": {
-                      "$ref": "workflowstep-schema-apply-application-v1-schema.json"
-                    }
-                  }
-                }
-              },
-              {
-                "if": {
-                  "properties": {
-                    "type": {
-                      "const": "apply-component"
-                    }
-                  }
-                },
-                "then": {
-                  "properties": {
-                    "properties": {
-                      "$ref": "workflowstep-schema-apply-component-schema.json"
-                    }
-                  }
-                }
-              },
-              {
-                "if": {
-                  "properties": {
-                    "type": {
-                      "const": "apply-component-v1"
-                    }
-                  }
-                },
-                "then": {
-                  "properties": {
-                    "properties": {
-                      "$ref": "workflowstep-schema-apply-component-v1-schema.json"
-                    }
-                  }
-                }
-              },
-              {
-                "if": {
-                  "properties": {
-                    "type": {
-                      "const": "apply-deployment"
-                    }
-                  }
-                },
-                "then": {
-                  "properties": {
-                    "properties": {
-                      "$ref": "workflowstep-schema-apply-deployment-schema.json"
-                    }
-                  }
-                }
-              },
-              {
-                "if": {
-                  "properties": {
-                    "type": {
-                      "const": "apply-deployment-v1"
-                    }
-                  }
-                },
-                "then": {
-                  "properties": {
-                    "properties": {
-                      "$ref": "workflowstep-schema-apply-deployment-v1-schema.json"
-                    }
-                  }
-                }
-              },
-              {
-                "if": {
-                  "properties": {
-                    "type": {
-                      "const": "apply-object"
-                    }
-                  }
-                },
-                "then": {
-                  "properties": {
-                    "properties": {
-                      "$ref": "workflowstep-schema-apply-object-schema.json"
-                    }
-                  }
-                }
-              },
-              {
-                "if": {
-                  "properties": {
-                    "type": {
-                      "const": "apply-object-v1"
-                    }
-                  }
-                },
-                "then": {
-                  "properties": {
-                    "properties": {
-                      "$ref": "workflowstep-schema-apply-object-v1-schema.json"
-                    }
-                  }
-                }
-              },
-              {
-                "if": {
-                  "properties": {
-                    "type": {
-                      "const": "apply-remaining"
-                    }
-                  }
-                },
-                "then": {
-                  "properties": {
-                    "properties": {
-                      "$ref": "workflowstep-schema-apply-remaining-schema.json"
-                    }
-                  }
-                }
-              },
-              {
-                "if": {
-                  "properties": {
-                    "type": {
-                      "const": "apply-remaining-v1"
-                    }
-                  }
-                },
-                "then": {
-                  "properties": {
-                    "properties": {
-                      "$ref": "workflowstep-schema-apply-remaining-v1-schema.json"
-                    }
-                  }
-                }
-              },
-              {
-                "if": {
-                  "properties": {
-                    "type": {
-                      "const": "apply-terraform-config"
-                    }
-                  }
-                },
-                "then": {
-                  "properties": {
-                    "properties": {
-                      "$ref": "workflowstep-schema-apply-terraform-config-schema.json"
-                    }
-                  }
-                }
-              },
-              {
-                "if": {
-                  "properties": {
-                    "type": {
-                      "const": "apply-terraform-config-v1"
-                    }
-                  }
-                },
-                "then": {
-                  "properties": {
-                    "properties": {
-                      "$ref": "workflowstep-schema-apply-terraform-config-v1-schema.json"
-                    }
-                  }
-                }
-              },
-              {
-                "if": {
-                  "properties": {
-                    "type": {
-                      "const": "build-push-image"
-                    }
-                  }
-                },
-                "then": {
-                  "properties": {
-                    "properties": {
-                      "$ref": "workflowstep-schema-build-push-image-schema.json"
-                    }
-                  }
-                }
-              },
-              {
-                "if": {
-                  "properties": {
-                    "type": {
-                      "const": "build-push-image-v1"
-                    }
-                  }
-                },
-                "then": {
-                  "properties": {
-                    "properties": {
-                      "$ref": "workflowstep-schema-build-push-image-v1-schema.json"
-                    }
-                  }
-                }
-              },
-              {
-                "if": {
-                  "properties": {
-                    "type": {
-                      "const": "check-metrics"
-                    }
-                  }
-                },
-                "then": {
-                  "properties": {
-                    "properties": {
-                      "$ref": "workflowstep-schema-check-metrics-schema.json"
-                    }
-                  }
-                }
-              },
-              {
-                "if": {
-                  "properties": {
-                    "type": {
-                      "const": "check-metrics-v1"
-                    }
-                  }
-                },
-                "then": {
-                  "properties": {
-                    "properties": {
-                      "$ref": "workflowstep-schema-check-metrics-v1-schema.json"
-                    }
-                  }
-                }
-              },
-              {
-                "if": {
-                  "properties": {
-                    "type": {
-                      "const": "clean-jobs"
-                    }
-                  }
-                },
-                "then": {
-                  "properties": {
-                    "properties": {
-                      "$ref": "workflowstep-schema-clean-jobs-schema.json"
-                    }
-                  }
-                }
-              },
-              {
-                "if": {
-                  "properties": {
-                    "type": {
-                      "const": "clean-jobs-v1"
-                    }
-                  }
-                },
-                "then": {
-                  "properties": {
-                    "properties": {
-                      "$ref": "workflowstep-schema-clean-jobs-v1-schema.json"
-                    }
-                  }
-                }
-              },
-              {
-                "if": {
-                  "properties": {
-                    "type": {
-                      "const": "collect-service-endpoints"
-                    }
-                  }
-                },
-                "then": {
-                  "properties": {
-                    "properties": {
-                      "$ref": "workflowstep-schema-collect-service-endpoints-schema.json"
-                    }
-                  }
-                }
-              },
-              {
-                "if": {
-                  "properties": {
-                    "type": {
-                      "const": "collect-service-endpoints-v1"
-                    }
-                  }
-                },
-                "then": {
-                  "properties": {
-                    "properties": {
-                      "$ref": "workflowstep-schema-collect-service-endpoints-v1-schema.json"
-                    }
-                  }
-                }
-              },
-              {
-                "if": {
-                  "properties": {
-                    "type": {
-                      "const": "create-config"
-                    }
-                  }
-                },
-                "then": {
-                  "properties": {
-                    "properties": {
-                      "$ref": "workflowstep-schema-create-config-schema.json"
-                    }
-                  }
-                }
-              },
-              {
-                "if": {
-                  "properties": {
-                    "type": {
-                      "const": "create-config-v1"
-                    }
-                  }
-                },
-                "then": {
-                  "properties": {
-                    "properties": {
-                      "$ref": "workflowstep-schema-create-config-v1-schema.json"
-                    }
-                  }
-                }
-              },
-              {
-                "if": {
-                  "properties": {
-                    "type": {
-                      "const": "delete-config"
-                    }
-                  }
-                },
-                "then": {
-                  "properties": {
-                    "properties": {
-                      "$ref": "workflowstep-schema-delete-config-schema.json"
-                    }
-                  }
-                }
-              },
-              {
-                "if": {
-                  "properties": {
-                    "type": {
-                      "const": "delete-config-v1"
-                    }
-                  }
-                },
-                "then": {
-                  "properties": {
-                    "properties": {
-                      "$ref": "workflowstep-schema-delete-config-v1-schema.json"
-                    }
-                  }
-                }
-              },
-              {
-                "if": {
-                  "properties": {
-                    "type": {
-                      "const": "depends-on-app"
-                    }
-                  }
-                },
-                "then": {
-                  "properties": {
-                    "properties": {
-                      "$ref": "workflowstep-schema-depends-on-app-schema.json"
-                    }
-                  }
-                }
-              },
-              {
-                "if": {
-                  "properties": {
-                    "type": {
-                      "const": "depends-on-app-v1"
-                    }
-                  }
-                },
-                "then": {
-                  "properties": {
-                    "properties": {
-                      "$ref": "workflowstep-schema-depends-on-app-v1-schema.json"
-                    }
-                  }
-                }
-              },
-              {
-                "if": {
-                  "properties": {
-                    "type": {
-                      "const": "deploy"
-                    }
-                  }
-                },
-                "then": {
-                  "properties": {
-                    "properties": {
-                      "$ref": "workflowstep-schema-deploy-schema.json"
-                    }
-                  }
-                }
-              },
-              {
-                "if": {
-                  "properties": {
-                    "type": {
-                      "const": "deploy-cloud-resource"
-                    }
-                  }
-                },
-                "then": {
-                  "properties": {
-                    "properties": {
-                      "$ref": "workflowstep-schema-deploy-cloud-resource-schema.json"
-                    }
-                  }
-                }
-              },
-              {
-                "if": {
-                  "properties": {
-                    "type": {
-                      "const": "deploy-cloud-resource-v1"
-                    }
-                  }
-                },
-                "then": {
-                  "properties": {
-                    "properties": {
-                      "$ref": "workflowstep-schema-deploy-cloud-resource-v1-schema.json"
-                    }
-                  }
-                }
-              },
-              {
-                "if": {
-                  "properties": {
-                    "type": {
-                      "const": "deploy-v1"
-                    }
-                  }
-                },
-                "then": {
-                  "properties": {
-                    "properties": {
-                      "$ref": "workflowstep-schema-deploy-v1-schema.json"
-                    }
-                  }
-                }
-              },
-              {
-                "if": {
-                  "properties": {
-                    "type": {
-                      "const": "deploy2env"
-                    }
-                  }
-                },
-                "then": {
-                  "properties": {
-                    "properties": {
-                      "$ref": "workflowstep-schema-deploy2env-schema.json"
-                    }
-                  }
-                }
-              },
-              {
-                "if": {
-                  "properties": {
-                    "type": {
-                      "const": "deploy2env-v1"
-                    }
-                  }
-                },
-                "then": {
-                  "properties": {
-                    "properties": {
-                      "$ref": "workflowstep-schema-deploy2env-v1-schema.json"
-                    }
-                  }
-                }
-              },
-              {
-                "if": {
-                  "properties": {
-                    "type": {
-                      "const": "deploy2runtime"
-                    }
-                  }
-                },
-                "then": {
-                  "properties": {
-                    "properties": {
-                      "$ref": "workflowstep-schema-deploy2runtime-schema.json"
-                    }
-                  }
-                }
-              },
-              {
-                "if": {
-                  "properties": {
-                    "type": {
-                      "const": "deploy2runtime-v1"
-                    }
-                  }
-                },
-                "then": {
-                  "properties": {
-                    "properties": {
-                      "$ref": "workflowstep-schema-deploy2runtime-v1-schema.json"
-                    }
-                  }
-                }
-              },
-              {
-                "if": {
-                  "properties": {
-                    "type": {
-                      "const": "export-data"
-                    }
-                  }
-                },
-                "then": {
-                  "properties": {
-                    "properties": {
-                      "$ref": "workflowstep-schema-export-data-schema.json"
-                    }
-                  }
-                }
-              },
-              {
-                "if": {
-                  "properties": {
-                    "type": {
-                      "const": "export-data-v1"
-                    }
-                  }
-                },
-                "then": {
-                  "properties": {
-                    "properties": {
-                      "$ref": "workflowstep-schema-export-data-v1-schema.json"
-                    }
-                  }
-                }
-              },
-              {
-                "if": {
-                  "properties": {
-                    "type": {
-                      "const": "export-service"
-                    }
-                  }
-                },
-                "then": {
-                  "properties": {
-                    "properties": {
-                      "$ref": "workflowstep-schema-export-service-schema.json"
-                    }
-                  }
-                }
-              },
-              {
-                "if": {
-                  "properties": {
-                    "type": {
-                      "const": "export-service-v1"
-                    }
-                  }
-                },
-                "then": {
-                  "properties": {
-                    "properties": {
-                      "$ref": "workflowstep-schema-export-service-v1-schema.json"
-                    }
-                  }
-                }
-              },
-              {
-                "if": {
-                  "properties": {
-                    "type": {
-                      "const": "export2config"
-                    }
-                  }
-                },
-                "then": {
-                  "properties": {
-                    "properties": {
-                      "$ref": "workflowstep-schema-export2config-schema.json"
-                    }
-                  }
-                }
-              },
-              {
-                "if": {
-                  "properties": {
-                    "type": {
-                      "const": "export2config-v1"
-                    }
-                  }
-                },
-                "then": {
-                  "properties": {
-                    "properties": {
-                      "$ref": "workflowstep-schema-export2config-v1-schema.json"
-                    }
-                  }
-                }
-              },
-              {
-                "if": {
-                  "properties": {
-                    "type": {
-                      "const": "export2secret"
-                    }
-                  }
-                },
-                "then": {
-                  "properties": {
-                    "properties": {
-                      "$ref": "workflowstep-schema-export2secret-schema.json"
-                    }
-                  }
-                }
-              },
-              {
-                "if": {
-                  "properties": {
-                    "type": {
-                      "const": "export2secret-v1"
-                    }
-                  }
-                },
-                "then": {
-                  "properties": {
-                    "properties": {
-                      "$ref": "workflowstep-schema-export2secret-v1-schema.json"
-                    }
-                  }
-                }
-              },
-              {
-                "if": {
-                  "properties": {
-                    "type": {
-                      "const": "generate-jdbc-connection"
-                    }
-                  }
-                },
-                "then": {
-                  "properties": {
-                    "properties": {
-                      "$ref": "workflowstep-schema-generate-jdbc-connection-schema.json"
-                    }
-                  }
-                }
-              },
-              {
-                "if": {
-                  "properties": {
-                    "type": {
-                      "const": "generate-jdbc-connection-v1"
-                    }
-                  }
-                },
-                "then": {
-                  "properties": {
-                    "properties": {
-                      "$ref": "workflowstep-schema-generate-jdbc-connection-v1-schema.json"
-                    }
-                  }
-                }
-              },
-              {
-                "if": {
-                  "properties": {
-                    "type": {
-                      "const": "list-config"
-                    }
-                  }
-                },
-                "then": {
-                  "properties": {
-                    "properties": {
-                      "$ref": "workflowstep-schema-list-config-schema.json"
-                    }
-                  }
-                }
-              },
-              {
-                "if": {
-                  "properties": {
-                    "type": {
-                      "const": "list-config-v1"
-                    }
-                  }
-                },
-                "then": {
-                  "properties": {
-                    "properties": {
-                      "$ref": "workflowstep-schema-list-config-v1-schema.json"
-                    }
-                  }
-                }
-              },
-              {
-                "if": {
-                  "properties": {
-                    "type": {
-                      "const": "notification"
-                    }
-                  }
-                },
-                "then": {
-                  "properties": {
-                    "properties": {
-                      "$ref": "workflowstep-schema-notification-schema.json"
-                    }
-                  }
-                }
-              },
-              {
-                "if": {
-                  "properties": {
-                    "type": {
-                      "const": "notification-v1"
-                    }
-                  }
-                },
-                "then": {
-                  "properties": {
-                    "properties": {
-                      "$ref": "workflowstep-schema-notification-v1-schema.json"
-                    }
-                  }
-                }
-              },
-              {
-                "if": {
-                  "properties": {
-                    "type": {
-                      "const": "print-message-in-status"
-                    }
-                  }
-                },
-                "then": {
-                  "properties": {
-                    "properties": {
-                      "$ref": "workflowstep-schema-print-message-in-status-schema.json"
-                    }
-                  }
-                }
-              },
-              {
-                "if": {
-                  "properties": {
-                    "type": {
-                      "const": "print-message-in-status-v1"
-                    }
-                  }
-                },
-                "then": {
-                  "properties": {
-                    "properties": {
-                      "$ref": "workflowstep-schema-print-message-in-status-v1-schema.json"
-                    }
-                  }
-                }
-              },
-              {
-                "if": {
-                  "properties": {
-                    "type": {
-                      "const": "read-config"
-                    }
-                  }
-                },
-                "then": {
-                  "properties": {
-                    "properties": {
-                      "$ref": "workflowstep-schema-read-config-schema.json"
-                    }
-                  }
-                }
-              },
-              {
-                "if": {
-                  "properties": {
-                    "type": {
-                      "const": "read-config-v1"
-                    }
-                  }
-                },
-                "then": {
-                  "properties": {
-                    "properties": {
-                      "$ref": "workflowstep-schema-read-config-v1-schema.json"
-                    }
-                  }
-                }
-              },
-              {
-                "if": {
-                  "properties": {
-                    "type": {
-                      "const": "read-object"
-                    }
-                  }
-                },
-                "then": {
-                  "properties": {
-                    "properties": {
-                      "$ref": "workflowstep-schema-read-object-schema.json"
-                    }
-                  }
-                }
-              },
-              {
-                "if": {
-                  "properties": {
-                    "type": {
-                      "const": "read-object-v1"
-                    }
-                  }
-                },
-                "then": {
-                  "properties": {
-                    "properties": {
-                      "$ref": "workflowstep-schema-read-object-v1-schema.json"
-                    }
-                  }
-                }
-              },
-              {
-                "if": {
-                  "properties": {
-                    "type": {
-                      "const": "request"
-                    }
-                  }
-                },
-                "then": {
-                  "properties": {
-                    "properties": {
-                      "$ref": "workflowstep-schema-request-schema.json"
-                    }
-                  }
-                }
-              },
-              {
-                "if": {
-                  "properties": {
-                    "type": {
-                      "const": "request-v1"
-                    }
-                  }
-                },
-                "then": {
-                  "properties": {
-                    "properties": {
-                      "$ref": "workflowstep-schema-request-v1-schema.json"
-                    }
-                  }
-                }
-              },
-              {
-                "if": {
-                  "properties": {
-                    "type": {
-                      "const": "share-cloud-resource"
-                    }
-                  }
-                },
-                "then": {
-                  "properties": {
-                    "properties": {
-                      "$ref": "workflowstep-schema-share-cloud-resource-schema.json"
-                    }
-                  }
-                }
-              },
-              {
-                "if": {
-                  "properties": {
-                    "type": {
-                      "const": "share-cloud-resource-v1"
-                    }
-                  }
-                },
-                "then": {
-                  "properties": {
-                    "properties": {
-                      "$ref": "workflowstep-schema-share-cloud-resource-v1-schema.json"
-                    }
-                  }
-                }
-              },
-              {
-                "if": {
-                  "properties": {
-                    "type": {
-                      "const": "step-group"
-                    }
-                  }
-                },
-                "then": {
-                  "properties": {
-                    "properties": {
-                      "$ref": "workflowstep-schema-step-group-schema.json"
-                    }
-                  }
-                }
-              },
-              {
-                "if": {
-                  "properties": {
-                    "type": {
-                      "const": "step-group-v1"
-                    }
-                  }
-                },
-                "then": {
-                  "properties": {
-                    "properties": {
-                      "$ref": "workflowstep-schema-step-group-v1-schema.json"
-                    }
-                  }
-                }
-              },
-              {
-                "if": {
-                  "properties": {
-                    "type": {
-                      "const": "suspend"
-                    }
-                  }
-                },
-                "then": {
-                  "properties": {
-                    "properties": {
-                      "$ref": "workflowstep-schema-suspend-schema.json"
-                    }
-                  }
-                }
-              },
-              {
-                "if": {
-                  "properties": {
-                    "type": {
-                      "const": "suspend-v1"
-                    }
-                  }
-                },
-                "then": {
-                  "properties": {
-                    "properties": {
-                      "$ref": "workflowstep-schema-suspend-v1-schema.json"
-                    }
-                  }
-                }
-              },
-              {
-                "if": {
-                  "properties": {
-                    "type": {
-                      "const": "vela-cli"
-                    }
-                  }
-                },
-                "then": {
-                  "properties": {
-                    "properties": {
-                      "$ref": "workflowstep-schema-vela-cli-schema.json"
-                    }
-                  }
-                }
-              },
-              {
-                "if": {
-                  "properties": {
-                    "type": {
-                      "const": "vela-cli-v1"
-                    }
-                  }
-                },
-                "then": {
-                  "properties": {
-                    "properties": {
-                      "$ref": "workflowstep-schema-vela-cli-v1-schema.json"
-                    }
-                  }
-                }
-              },
-              {
-                "if": {
-                  "properties": {
-                    "type": {
-                      "const": "webhook"
-                    }
-                  }
-                },
-                "then": {
-                  "properties": {
-                    "properties": {
-                      "$ref": "workflowstep-schema-webhook-schema.json"
-                    }
-                  }
-                }
-              },
-              {
-                "if": {
-                  "properties": {
-                    "type": {
-                      "const": "webhook-v1"
-                    }
-                  }
-                },
-                "then": {
-                  "properties": {
-                    "properties": {
-                      "$ref": "workflowstep-schema-webhook-v1-schema.json"
-                    }
-                  }
-                }
               }
-            ]
+            ],
+            "description": "An application-level policy (e.g. override, topology, garbage-collect).",
+            "properties": {
+              "name": {
+                "description": "A unique name for this policy.",
+                "type": "string"
+              },
+              "properties": {
+                "description": "Policy-specific properties. Set 'type' first, then Ctrl+Space here.",
+                "type": "object"
+              },
+              "type": {
+                "description": "The policy type. Controls which 'properties' are valid.",
+                "enum": [
+                  "apply-once",
+                  "envbinding",
+                  "garbage-collect",
+                  "override",
+                  "read-only",
+                  "replication",
+                  "resource-update",
+                  "shared-resource",
+                  "take-over",
+                  "topology"
+                ],
+                "type": "string"
+              }
+            },
+            "required": [
+              "name",
+              "type"
+            ],
+            "type": "object"
           },
           "type": "array"
+        },
+        "workflow": {
+          "description": "Custom deployment workflow. If omitted, KubeVela deploys all components in parallel.",
+          "properties": {
+            "mode": {
+              "description": "Execution mode for the workflow steps.",
+              "properties": {
+                "steps": {
+                  "description": "Top-level step execution order. DAG = parallel where possible, StepByStep = sequential.",
+                  "enum": [
+                    "DAG",
+                    "StepByStep"
+                  ],
+                  "type": "string"
+                },
+                "subSteps": {
+                  "description": "Execution order for steps inside a step-group.",
+                  "enum": [
+                    "DAG",
+                    "StepByStep"
+                  ],
+                  "type": "string"
+                }
+              },
+              "type": "object"
+            },
+            "steps": {
+              "description": "Ordered list of workflow steps.",
+              "items": {
+                "allOf": [
+                  {
+                    "if": {
+                      "properties": {
+                        "type": {
+                          "const": "apply-application"
+                        }
+                      },
+                      "required": [
+                        "type"
+                      ]
+                    },
+                    "then": {
+                      "properties": {
+                        "properties": {
+                          "$ref": "workflowstep-schema-apply-application-schema.json"
+                        }
+                      }
+                    }
+                  },
+                  {
+                    "if": {
+                      "properties": {
+                        "type": {
+                          "const": "apply-application-in-parallel"
+                        }
+                      },
+                      "required": [
+                        "type"
+                      ]
+                    },
+                    "then": {
+                      "properties": {
+                        "properties": {
+                          "$ref": "workflowstep-schema-apply-application-in-parallel-schema.json"
+                        }
+                      }
+                    }
+                  },
+                  {
+                    "if": {
+                      "properties": {
+                        "type": {
+                          "const": "apply-component"
+                        }
+                      },
+                      "required": [
+                        "type"
+                      ]
+                    },
+                    "then": {
+                      "properties": {
+                        "properties": {
+                          "$ref": "workflowstep-schema-apply-component-schema.json"
+                        }
+                      }
+                    }
+                  },
+                  {
+                    "if": {
+                      "properties": {
+                        "type": {
+                          "const": "apply-deployment"
+                        }
+                      },
+                      "required": [
+                        "type"
+                      ]
+                    },
+                    "then": {
+                      "properties": {
+                        "properties": {
+                          "$ref": "workflowstep-schema-apply-deployment-schema.json"
+                        }
+                      }
+                    }
+                  },
+                  {
+                    "if": {
+                      "properties": {
+                        "type": {
+                          "const": "apply-object"
+                        }
+                      },
+                      "required": [
+                        "type"
+                      ]
+                    },
+                    "then": {
+                      "properties": {
+                        "properties": {
+                          "$ref": "workflowstep-schema-apply-object-schema.json"
+                        }
+                      }
+                    }
+                  },
+                  {
+                    "if": {
+                      "properties": {
+                        "type": {
+                          "const": "apply-remaining"
+                        }
+                      },
+                      "required": [
+                        "type"
+                      ]
+                    },
+                    "then": {
+                      "properties": {
+                        "properties": {
+                          "$ref": "workflowstep-schema-apply-remaining-schema.json"
+                        }
+                      }
+                    }
+                  },
+                  {
+                    "if": {
+                      "properties": {
+                        "type": {
+                          "const": "apply-terraform-config"
+                        }
+                      },
+                      "required": [
+                        "type"
+                      ]
+                    },
+                    "then": {
+                      "properties": {
+                        "properties": {
+                          "$ref": "workflowstep-schema-apply-terraform-config-schema.json"
+                        }
+                      }
+                    }
+                  },
+                  {
+                    "if": {
+                      "properties": {
+                        "type": {
+                          "const": "build-push-image"
+                        }
+                      },
+                      "required": [
+                        "type"
+                      ]
+                    },
+                    "then": {
+                      "properties": {
+                        "properties": {
+                          "$ref": "workflowstep-schema-build-push-image-schema.json"
+                        }
+                      }
+                    }
+                  },
+                  {
+                    "if": {
+                      "properties": {
+                        "type": {
+                          "const": "check-metrics"
+                        }
+                      },
+                      "required": [
+                        "type"
+                      ]
+                    },
+                    "then": {
+                      "properties": {
+                        "properties": {
+                          "$ref": "workflowstep-schema-check-metrics-schema.json"
+                        }
+                      }
+                    }
+                  },
+                  {
+                    "if": {
+                      "properties": {
+                        "type": {
+                          "const": "clean-jobs"
+                        }
+                      },
+                      "required": [
+                        "type"
+                      ]
+                    },
+                    "then": {
+                      "properties": {
+                        "properties": {
+                          "$ref": "workflowstep-schema-clean-jobs-schema.json"
+                        }
+                      }
+                    }
+                  },
+                  {
+                    "if": {
+                      "properties": {
+                        "type": {
+                          "const": "collect-service-endpoints"
+                        }
+                      },
+                      "required": [
+                        "type"
+                      ]
+                    },
+                    "then": {
+                      "properties": {
+                        "properties": {
+                          "$ref": "workflowstep-schema-collect-service-endpoints-schema.json"
+                        }
+                      }
+                    }
+                  },
+                  {
+                    "if": {
+                      "properties": {
+                        "type": {
+                          "const": "create-config"
+                        }
+                      },
+                      "required": [
+                        "type"
+                      ]
+                    },
+                    "then": {
+                      "properties": {
+                        "properties": {
+                          "$ref": "workflowstep-schema-create-config-schema.json"
+                        }
+                      }
+                    }
+                  },
+                  {
+                    "if": {
+                      "properties": {
+                        "type": {
+                          "const": "delete-config"
+                        }
+                      },
+                      "required": [
+                        "type"
+                      ]
+                    },
+                    "then": {
+                      "properties": {
+                        "properties": {
+                          "$ref": "workflowstep-schema-delete-config-schema.json"
+                        }
+                      }
+                    }
+                  },
+                  {
+                    "if": {
+                      "properties": {
+                        "type": {
+                          "const": "depends-on-app"
+                        }
+                      },
+                      "required": [
+                        "type"
+                      ]
+                    },
+                    "then": {
+                      "properties": {
+                        "properties": {
+                          "$ref": "workflowstep-schema-depends-on-app-schema.json"
+                        }
+                      }
+                    }
+                  },
+                  {
+                    "if": {
+                      "properties": {
+                        "type": {
+                          "const": "deploy"
+                        }
+                      },
+                      "required": [
+                        "type"
+                      ]
+                    },
+                    "then": {
+                      "properties": {
+                        "properties": {
+                          "$ref": "workflowstep-schema-deploy-schema.json"
+                        }
+                      }
+                    }
+                  },
+                  {
+                    "if": {
+                      "properties": {
+                        "type": {
+                          "const": "deploy-cloud-resource"
+                        }
+                      },
+                      "required": [
+                        "type"
+                      ]
+                    },
+                    "then": {
+                      "properties": {
+                        "properties": {
+                          "$ref": "workflowstep-schema-deploy-cloud-resource-schema.json"
+                        }
+                      }
+                    }
+                  },
+                  {
+                    "if": {
+                      "properties": {
+                        "type": {
+                          "const": "deploy2env"
+                        }
+                      },
+                      "required": [
+                        "type"
+                      ]
+                    },
+                    "then": {
+                      "properties": {
+                        "properties": {
+                          "$ref": "workflowstep-schema-deploy2env-schema.json"
+                        }
+                      }
+                    }
+                  },
+                  {
+                    "if": {
+                      "properties": {
+                        "type": {
+                          "const": "deploy2runtime"
+                        }
+                      },
+                      "required": [
+                        "type"
+                      ]
+                    },
+                    "then": {
+                      "properties": {
+                        "properties": {
+                          "$ref": "workflowstep-schema-deploy2runtime-schema.json"
+                        }
+                      }
+                    }
+                  },
+                  {
+                    "if": {
+                      "properties": {
+                        "type": {
+                          "const": "export-data"
+                        }
+                      },
+                      "required": [
+                        "type"
+                      ]
+                    },
+                    "then": {
+                      "properties": {
+                        "properties": {
+                          "$ref": "workflowstep-schema-export-data-schema.json"
+                        }
+                      }
+                    }
+                  },
+                  {
+                    "if": {
+                      "properties": {
+                        "type": {
+                          "const": "export-service"
+                        }
+                      },
+                      "required": [
+                        "type"
+                      ]
+                    },
+                    "then": {
+                      "properties": {
+                        "properties": {
+                          "$ref": "workflowstep-schema-export-service-schema.json"
+                        }
+                      }
+                    }
+                  },
+                  {
+                    "if": {
+                      "properties": {
+                        "type": {
+                          "const": "export2config"
+                        }
+                      },
+                      "required": [
+                        "type"
+                      ]
+                    },
+                    "then": {
+                      "properties": {
+                        "properties": {
+                          "$ref": "workflowstep-schema-export2config-schema.json"
+                        }
+                      }
+                    }
+                  },
+                  {
+                    "if": {
+                      "properties": {
+                        "type": {
+                          "const": "export2secret"
+                        }
+                      },
+                      "required": [
+                        "type"
+                      ]
+                    },
+                    "then": {
+                      "properties": {
+                        "properties": {
+                          "$ref": "workflowstep-schema-export2secret-schema.json"
+                        }
+                      }
+                    }
+                  },
+                  {
+                    "if": {
+                      "properties": {
+                        "type": {
+                          "const": "generate-jdbc-connection"
+                        }
+                      },
+                      "required": [
+                        "type"
+                      ]
+                    },
+                    "then": {
+                      "properties": {
+                        "properties": {
+                          "$ref": "workflowstep-schema-generate-jdbc-connection-schema.json"
+                        }
+                      }
+                    }
+                  },
+                  {
+                    "if": {
+                      "properties": {
+                        "type": {
+                          "const": "list-config"
+                        }
+                      },
+                      "required": [
+                        "type"
+                      ]
+                    },
+                    "then": {
+                      "properties": {
+                        "properties": {
+                          "$ref": "workflowstep-schema-list-config-schema.json"
+                        }
+                      }
+                    }
+                  },
+                  {
+                    "if": {
+                      "properties": {
+                        "type": {
+                          "const": "notification"
+                        }
+                      },
+                      "required": [
+                        "type"
+                      ]
+                    },
+                    "then": {
+                      "properties": {
+                        "properties": {
+                          "$ref": "workflowstep-schema-notification-schema.json"
+                        }
+                      }
+                    }
+                  },
+                  {
+                    "if": {
+                      "properties": {
+                        "type": {
+                          "const": "print-message-in-status"
+                        }
+                      },
+                      "required": [
+                        "type"
+                      ]
+                    },
+                    "then": {
+                      "properties": {
+                        "properties": {
+                          "$ref": "workflowstep-schema-print-message-in-status-schema.json"
+                        }
+                      }
+                    }
+                  },
+                  {
+                    "if": {
+                      "properties": {
+                        "type": {
+                          "const": "read-config"
+                        }
+                      },
+                      "required": [
+                        "type"
+                      ]
+                    },
+                    "then": {
+                      "properties": {
+                        "properties": {
+                          "$ref": "workflowstep-schema-read-config-schema.json"
+                        }
+                      }
+                    }
+                  },
+                  {
+                    "if": {
+                      "properties": {
+                        "type": {
+                          "const": "read-object"
+                        }
+                      },
+                      "required": [
+                        "type"
+                      ]
+                    },
+                    "then": {
+                      "properties": {
+                        "properties": {
+                          "$ref": "workflowstep-schema-read-object-schema.json"
+                        }
+                      }
+                    }
+                  },
+                  {
+                    "if": {
+                      "properties": {
+                        "type": {
+                          "const": "request"
+                        }
+                      },
+                      "required": [
+                        "type"
+                      ]
+                    },
+                    "then": {
+                      "properties": {
+                        "properties": {
+                          "$ref": "workflowstep-schema-request-schema.json"
+                        }
+                      }
+                    }
+                  },
+                  {
+                    "if": {
+                      "properties": {
+                        "type": {
+                          "const": "share-cloud-resource"
+                        }
+                      },
+                      "required": [
+                        "type"
+                      ]
+                    },
+                    "then": {
+                      "properties": {
+                        "properties": {
+                          "$ref": "workflowstep-schema-share-cloud-resource-schema.json"
+                        }
+                      }
+                    }
+                  },
+                  {
+                    "if": {
+                      "properties": {
+                        "type": {
+                          "const": "step-group"
+                        }
+                      },
+                      "required": [
+                        "type"
+                      ]
+                    },
+                    "then": {
+                      "properties": {
+                        "properties": {
+                          "$ref": "workflowstep-schema-step-group-schema.json"
+                        }
+                      }
+                    }
+                  },
+                  {
+                    "if": {
+                      "properties": {
+                        "type": {
+                          "const": "suspend"
+                        }
+                      },
+                      "required": [
+                        "type"
+                      ]
+                    },
+                    "then": {
+                      "properties": {
+                        "properties": {
+                          "$ref": "workflowstep-schema-suspend-schema.json"
+                        }
+                      }
+                    }
+                  },
+                  {
+                    "if": {
+                      "properties": {
+                        "type": {
+                          "const": "vela-cli"
+                        }
+                      },
+                      "required": [
+                        "type"
+                      ]
+                    },
+                    "then": {
+                      "properties": {
+                        "properties": {
+                          "$ref": "workflowstep-schema-vela-cli-schema.json"
+                        }
+                      }
+                    }
+                  },
+                  {
+                    "if": {
+                      "properties": {
+                        "type": {
+                          "const": "webhook"
+                        }
+                      },
+                      "required": [
+                        "type"
+                      ]
+                    },
+                    "then": {
+                      "properties": {
+                        "properties": {
+                          "$ref": "workflowstep-schema-webhook-schema.json"
+                        }
+                      }
+                    }
+                  }
+                ],
+                "description": "A single step in the application deployment workflow.",
+                "properties": {
+                  "dependsOn": {
+                    "items": {
+                      "type": "string"
+                    },
+                    "type": "array"
+                  },
+                  "if": {
+                    "description": "A CUE expression. If false, this step is skipped.",
+                    "type": "string"
+                  },
+                  "inputs": {
+                    "type": "array"
+                  },
+                  "name": {
+                    "description": "A unique name for this workflow step.",
+                    "type": "string"
+                  },
+                  "outputs": {
+                    "type": "array"
+                  },
+                  "properties": {
+                    "description": "Step-specific properties. Set 'type' first, then Ctrl+Space here.",
+                    "type": "object"
+                  },
+                  "timeout": {
+                    "description": "Maximum time to wait for this step, e.g. '10m'.",
+                    "type": "string"
+                  },
+                  "type": {
+                    "description": "The workflow step type. Controls which 'properties' are valid.",
+                    "enum": [
+                      "apply-application",
+                      "apply-application-in-parallel",
+                      "apply-component",
+                      "apply-deployment",
+                      "apply-object",
+                      "apply-remaining",
+                      "apply-terraform-config",
+                      "build-push-image",
+                      "check-metrics",
+                      "clean-jobs",
+                      "collect-service-endpoints",
+                      "create-config",
+                      "delete-config",
+                      "depends-on-app",
+                      "deploy",
+                      "deploy-cloud-resource",
+                      "deploy2env",
+                      "deploy2runtime",
+                      "export-data",
+                      "export-service",
+                      "export2config",
+                      "export2secret",
+                      "generate-jdbc-connection",
+                      "list-config",
+                      "notification",
+                      "print-message-in-status",
+                      "read-config",
+                      "read-object",
+                      "request",
+                      "share-cloud-resource",
+                      "step-group",
+                      "suspend",
+                      "vela-cli",
+                      "webhook"
+                    ],
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "name",
+                  "type"
+                ],
+                "type": "object"
+              },
+              "type": "array"
+            }
+          },
+          "type": "object"
         }
-      }
+      },
+      "required": [
+        "components"
+      ],
+      "type": "object"
     }
   },
-  "title": "KubeVela Application"
+  "required": [
+    "apiVersion",
+    "kind",
+    "metadata",
+    "spec"
+  ],
+  "title": "KubeVela Application",
+  "type": "object"
 }
