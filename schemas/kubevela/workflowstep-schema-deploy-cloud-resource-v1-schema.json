@@ -1,0 +1,1 @@
+{"properties":{"env":{"description":"Declare the name of the env in policy","title":"env","type":"string"},"policy":{"default":"","description":"Declare the name of the env-binding policy, if empty, the first env-binding policy will be used","title":"policy","type":"string"}},"required":["policy","env"],"type":"object"}

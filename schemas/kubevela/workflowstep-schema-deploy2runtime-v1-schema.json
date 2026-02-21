@@ -1,0 +1,1 @@
+{"properties":{"clusters":{"description":"Declare the runtime clusters to apply, if empty, all runtime clusters will be used","items":{"type":"string"},"title":"clusters","type":"array"}},"type":"object"}

@@ -1,0 +1,1 @@
+{"properties":{"operations":{"items":{"additionalProperties":{},"type":"object"},"title":"operations","type":"array"}},"required":["operations"],"type":"object"}

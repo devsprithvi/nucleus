@@ -1,0 +1,1 @@
+{"properties":{"labelselector":{"additionalProperties":{},"title":"labelselector","type":"object"},"namespace":{"title":"namespace","type":"string"}},"required":["namespace"],"type":"object"}
