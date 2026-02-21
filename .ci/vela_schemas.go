@@ -216,40 +216,56 @@ func buildRunnerContainer(dag *dagger.Client) *dagger.Container {
 }
 
 // schemaEntry pairs the short KubeVela type name (what users write in YAML)
-// with the full filename used for $ref routing.
+// with the full filename on disk and the definition category.
 type schemaEntry struct {
-	// typeName is the short name the user writes in their app.yaml, e.g. "webservice"
-	typeName string
-	// fileName is the full schema file saved to disk, e.g. "component-schema-webservice-schema.json"
-	fileName string
+	typeName string // short type users write, e.g. "webservice"
+	fileName string // file on disk, e.g. "component-schema-webservice-schema.json"
+	category string // "component" | "trait" | "policy" | "workflowstep"
 }
 
-// categoryPrefixes are the prefixes that KubeVela prepends to ConfigMap names.
-// Stripping these gives the actual component/trait/policy type name.
-var categoryPrefixes = []string{
-	"component-schema-",
-	"trait-schema-",
-	"policy-schema-",
-	"workflowstep-schema-",
+// categoryInfo maps ConfigMap name prefixes to their definition category.
+var categoryInfo = []struct {
+	prefix   string
+	category string
+}{
+	{"component-schema-", "component"},
+	{"trait-schema-", "trait"},
+	{"policy-schema-", "policy"},
+	{"workflowstep-schema-", "workflowstep"},
 }
 
-// shortTypeName strips both the outer "schema-" prefix and the category prefix
-// to derive the real KubeVela type name (e.g. "schema-component-schema-webservice" → "webservice").
-func shortTypeName(configMapName string) string {
-	// Strip the outer "schema-" added by KubeVela's ConfigMap naming
+// parseEntry derives the short type name and category from a KubeVela ConfigMap name.
+// ConfigMap names follow: schema-<category-prefix><type-name>
+// e.g. "schema-component-schema-webservice" → typeName="webservice", category="component"
+// Returns empty strings if the entry should be skipped (e.g. versioned duplicates ending in -v<n>).
+func parseEntry(configMapName string) (typeName, category string) {
 	name := strings.TrimPrefix(configMapName, "schema-")
-	for _, prefix := range categoryPrefixes {
-		if strings.HasPrefix(name, prefix) {
-			return strings.TrimPrefix(name, prefix)
+	for _, ci := range categoryInfo {
+		if strings.HasPrefix(name, ci.prefix) {
+			shortName := strings.TrimPrefix(name, ci.prefix)
+			// Skip "-v1", "-v2" etc. – they are identical duplicates of the non-versioned entries.
+			// A versioned entry ends in "-v" followed only by digits.
+			if idx := strings.LastIndex(shortName, "-v"); idx >= 0 {
+				suffix := shortName[idx+2:]
+				isAllDigits := len(suffix) > 0
+				for _, ch := range suffix {
+					if ch < '0' || ch > '9' {
+						isAllDigits = false
+						break
+					}
+				}
+				if isAllDigits {
+					return "", "" // signal to skip
+				}
+			}
+			return shortName, ci.category
 		}
 	}
-	// Fallback: return as-is if no known prefix matches
-	return name
+	return name, "component" // fallback
 }
 
-// writeIndividualSchemas loops through the retrieved ConfigMaps and writes each
-// JSON schema into the Dagger directory. It returns schemaEntry pairs so the
-// master schema can correctly map short type names to file references.
+// writeIndividualSchemas writes each ConfigMap's JSON schema to the Dagger directory
+// and returns categorized schemaEntry values for master schema construction.
 func writeIndividualSchemas(dir *dagger.Directory, list SchemaMapList) (*dagger.Directory, []schemaEntry) {
 	var entries []schemaEntry
 
@@ -259,58 +275,281 @@ func writeIndividualSchemas(dir *dagger.Directory, list SchemaMapList) (*dagger.
 			continue
 		}
 
-		// e.g. "schema-component-schema-webservice" → full name without outer prefix
+		typeName, category := parseEntry(item.Metadata.Name)
+		if typeName == "" {
+			continue // skip versioned duplicates
+		}
+
 		fullName := strings.TrimPrefix(item.Metadata.Name, "schema-")
 		fileName := fmt.Sprintf("%s-schema.json", fullName)
-		typeName := shortTypeName(item.Metadata.Name)
 
-		entries = append(entries, schemaEntry{typeName: typeName, fileName: fileName})
+		entries = append(entries, schemaEntry{typeName: typeName, fileName: fileName, category: category})
 		dir = dir.WithNewFile(fileName, schemaContent)
 	}
 
 	return dir, entries
 }
 
-// injectMasterSchema dynamically builds the root vela-application-schema.json
-// that routes the 'type' field in a component entry to its specific schema file.
-// The if/const matches the SHORT type name (e.g. "webservice") that users write
-// in their app.yaml, while the $ref points to the full filename on disk.
-func injectMasterSchema(dir *dagger.Directory, entries []schemaEntry) (*dagger.Directory, error) {
-	var oneOfRules []map[string]interface{}
-
+// buildConditionals creates allOf if/then rules that activate a $ref schema
+// on the 'properties' key when the 'type' field matches a known value.
+// Using allOf+if/then instead of oneOf means the base item schema always
+// applies and VS Code never gets confused when 'type' hasn't been typed yet.
+func buildConditionals(entries []schemaEntry) []map[string]interface{} {
+	var rules []map[string]interface{}
 	for _, e := range entries {
-		rule := map[string]interface{}{
-			// Match on what the user actually types: type: webservice
+		rules = append(rules, map[string]interface{}{
 			"if": map[string]interface{}{
 				"properties": map[string]interface{}{
 					"type": map[string]interface{}{"const": e.typeName},
 				},
+				"required": []string{"type"},
 			},
-			// Route to the correct schema file for that component type
 			"then": map[string]interface{}{
 				"properties": map[string]interface{}{
-					"properties": map[string]interface{}{
-						"$ref": e.fileName,
+					"properties": map[string]interface{}{"$ref": e.fileName},
+				},
+			},
+		})
+	}
+	return rules
+}
+
+// typeEnum extracts an ordered list of type name strings for an enum field.
+func typeEnum(entries []schemaEntry) []string {
+	names := make([]string, 0, len(entries))
+	for _, e := range entries {
+		names = append(names, e.typeName)
+	}
+	return names
+}
+
+// injectMasterSchema builds a complete, IDE-friendly vela-application-schema.json.
+//
+// The schema explicitly defines every field a user will encounter in an app.yaml:
+//   - metadata.name / namespace / labels / annotations
+//   - spec.components[].name, type (enum), properties, traits, dependsOn
+//   - spec.components[].traits[].type (enum), properties
+//   - spec.policies[].name, type (enum), properties
+//   - spec.workflow.steps[].name, type (enum), properties
+//
+// allOf + if/then rules activate the per-type $ref on 'properties' so that
+// after the user writes 'type: webservice', the webservice schema drives hints.
+func injectMasterSchema(dir *dagger.Directory, entries []schemaEntry) (*dagger.Directory, error) {
+	// ----- bucket entries by category -----
+	var compEntries, traitEntries, policyEntries, wfEntries []schemaEntry
+	for _, e := range entries {
+		switch e.category {
+		case "component":
+			compEntries = append(compEntries, e)
+		case "trait":
+			traitEntries = append(traitEntries, e)
+		case "policy":
+			policyEntries = append(policyEntries, e)
+		case "workflowstep":
+			wfEntries = append(wfEntries, e)
+		}
+	}
+
+	// ----- trait item schema -----
+	traitItem := map[string]interface{}{
+		"type":        "object",
+		"description": "An operational capability attached to a component (e.g. ingress, scaler, resource limits).",
+		"required":    []string{"type"},
+		"properties": map[string]interface{}{
+			"type": map[string]interface{}{
+				"type":        "string",
+				"description": "The trait definition type. Controls which 'properties' are valid.",
+				"enum":        typeEnum(traitEntries),
+			},
+			"properties": map[string]interface{}{
+				"type":        "object",
+				"description": "Trait-specific properties. Set 'type' first, then use Ctrl+Space here.",
+			},
+		},
+		"allOf": buildConditionals(traitEntries),
+	}
+
+	// ----- component item schema -----
+	componentItem := map[string]interface{}{
+		"type":        "object",
+		"description": "A single workload component of the application.",
+		"required":    []string{"name", "type"},
+		"properties": map[string]interface{}{
+			"name": map[string]interface{}{
+				"type":        "string",
+				"description": "A unique name for this component instance within the application.",
+			},
+			"type": map[string]interface{}{
+				"type":        "string",
+				"description": "The component definition type. Controls which 'properties' are valid. Use Ctrl+Space to see all options.",
+				"enum":        typeEnum(compEntries),
+			},
+			"properties": map[string]interface{}{
+				"type":        "object",
+				"description": "Component-specific properties. Set 'type' first, then Ctrl+Space here for field hints.",
+			},
+			"traits": map[string]interface{}{
+				"type":        "array",
+				"description": "Operational traits to attach to this component (ingress, scaler, resource limits, etc.).",
+				"items":       traitItem,
+			},
+			"dependsOn": map[string]interface{}{
+				"type":        "array",
+				"description": "Names of other components in the same application that must be deployed first.",
+				"items":       map[string]interface{}{"type": "string"},
+			},
+			"externalRevision": map[string]interface{}{
+				"type":        "string",
+				"description": "Pin to a specific component revision by name.",
+			},
+		},
+		// allOf applies per-type property schemas without breaking base schema hints
+		"allOf": buildConditionals(compEntries),
+	}
+
+	// ----- policy item schema -----
+	policyItem := map[string]interface{}{
+		"type":        "object",
+		"description": "An application-level policy (e.g. override, topology, garbage-collect).",
+		"required":    []string{"name", "type"},
+		"properties": map[string]interface{}{
+			"name": map[string]interface{}{
+				"type":        "string",
+				"description": "A unique name for this policy.",
+			},
+			"type": map[string]interface{}{
+				"type":        "string",
+				"description": "The policy type. Controls which 'properties' are valid.",
+				"enum":        typeEnum(policyEntries),
+			},
+			"properties": map[string]interface{}{
+				"type":        "object",
+				"description": "Policy-specific properties. Set 'type' first, then Ctrl+Space here.",
+			},
+		},
+		"allOf": buildConditionals(policyEntries),
+	}
+
+	// ----- workflow step item schema -----
+	workflowStepItem := map[string]interface{}{
+		"type":        "object",
+		"description": "A single step in the application deployment workflow.",
+		"required":    []string{"name", "type"},
+		"properties": map[string]interface{}{
+			"name": map[string]interface{}{
+				"type":        "string",
+				"description": "A unique name for this workflow step.",
+			},
+			"type": map[string]interface{}{
+				"type":        "string",
+				"description": "The workflow step type. Controls which 'properties' are valid.",
+				"enum":        typeEnum(wfEntries),
+			},
+			"properties": map[string]interface{}{
+				"type":        "object",
+				"description": "Step-specific properties. Set 'type' first, then Ctrl+Space here.",
+			},
+			"dependsOn": map[string]interface{}{
+				"type":  "array",
+				"items": map[string]interface{}{"type": "string"},
+			},
+			"if": map[string]interface{}{
+				"type":        "string",
+				"description": "A CUE expression. If false, this step is skipped.",
+			},
+			"timeout": map[string]interface{}{
+				"type":        "string",
+				"description": "Maximum time to wait for this step, e.g. '10m'.",
+			},
+			"inputs":  map[string]interface{}{"type": "array"},
+			"outputs": map[string]interface{}{"type": "array"},
+		},
+		"allOf": buildConditionals(wfEntries),
+	}
+
+	// ----- root master schema -----
+	masterSchema := map[string]interface{}{
+		"$schema":     "http://json-schema.org/draft-07/schema#",
+		"title":       "KubeVela Application",
+		"description": "Defines a KubeVela Application resource (OAM Application). Schemas generated from live cluster.",
+		"type":        "object",
+		"required":    []string{"apiVersion", "kind", "metadata", "spec"},
+		"properties": map[string]interface{}{
+			"apiVersion": map[string]interface{}{
+				"type":        "string",
+				"const":       "core.oam.dev/v1beta1",
+				"description": "Must be 'core.oam.dev/v1beta1'.",
+			},
+			"kind": map[string]interface{}{
+				"type":        "string",
+				"const":       "Application",
+				"description": "Must be 'Application'. Other OAM kinds (ComponentDefinition, TraitDefinition) are for platform operators.",
+			},
+			"metadata": map[string]interface{}{
+				"type":        "object",
+				"description": "Standard Kubernetes object metadata.",
+				"required":    []string{"name"},
+				"properties": map[string]interface{}{
+					"name": map[string]interface{}{
+						"type":        "string",
+						"description": "The application name. Used as the Kubernetes resource name.",
+					},
+					"namespace": map[string]interface{}{
+						"type":        "string",
+						"description": "Kubernetes namespace to deploy into. Defaults to the cluster default.",
+					},
+					"labels": map[string]interface{}{
+						"type":                 "object",
+						"additionalProperties": map[string]interface{}{"type": "string"},
+						"description":          "Key-value labels attached to this Application resource.",
+					},
+					"annotations": map[string]interface{}{
+						"type":                 "object",
+						"additionalProperties": map[string]interface{}{"type": "string"},
+						"description":          "Key-value annotations attached to this Application resource.",
 					},
 				},
 			},
-		}
-		oneOfRules = append(oneOfRules, rule)
-	}
-
-	// Construct the foundational KubeVela Application schema
-	masterSchema := map[string]interface{}{
-		"$schema": "http://json-schema.org/draft-07/schema#",
-		"title":   "KubeVela Application",
-		"properties": map[string]interface{}{
-			"apiVersion": map[string]interface{}{"const": "core.oam.dev/v1beta1"},
-			"kind":       map[string]interface{}{"const": "Application"},
 			"spec": map[string]interface{}{
+				"type":        "object",
+				"description": "The desired state of the Application.",
+				"required":    []string{"components"},
 				"properties": map[string]interface{}{
 					"components": map[string]interface{}{
-						"type": "array",
-						"items": map[string]interface{}{
-							"oneOf": oneOfRules,
+						"type":        "array",
+						"description": "The list of workload components that make up this application.",
+						"items":       componentItem,
+					},
+					"policies": map[string]interface{}{
+						"type":        "array",
+						"description": "Application-level policies such as topology, override, garbage-collect.",
+						"items":       policyItem,
+					},
+					"workflow": map[string]interface{}{
+						"type":        "object",
+						"description": "Custom deployment workflow. If omitted, KubeVela deploys all components in parallel.",
+						"properties": map[string]interface{}{
+							"mode": map[string]interface{}{
+								"type":        "object",
+								"description": "Execution mode for the workflow steps.",
+								"properties": map[string]interface{}{
+									"steps": map[string]interface{}{
+										"type":        "string",
+										"enum":        []string{"DAG", "StepByStep"},
+										"description": "Top-level step execution order. DAG = parallel where possible, StepByStep = sequential.",
+									},
+									"subSteps": map[string]interface{}{
+										"type":        "string",
+										"enum":        []string{"DAG", "StepByStep"},
+										"description": "Execution order for steps inside a step-group.",
+									},
+								},
+							},
+							"steps": map[string]interface{}{
+								"type":        "array",
+								"description": "Ordered list of workflow steps.",
+								"items":       workflowStepItem,
+							},
 						},
 					},
 				},
@@ -318,12 +557,10 @@ func injectMasterSchema(dir *dagger.Directory, entries []schemaEntry) (*dagger.D
 		},
 	}
 
-	// Convert the map structure into a formatted JSON string
 	masterJSONBytes, err := json.MarshalIndent(masterSchema, "", "  ")
 	if err != nil {
 		return nil, err
 	}
 
-	// Add the stitched master schema to the directory
 	return dir.WithNewFile("vela-application-schema.json", string(masterJSONBytes)), nil
 }
