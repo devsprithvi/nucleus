@@ -1,1 +1,37 @@
-{"properties":{"auto":{"default":true,"description":"If set to false, the workflow will suspend automatically before this step, default to be true.","title":"auto","type":"boolean"},"ignoreTerraformComponent":{"default":true,"description":"If set false, this step will apply the components with the terraform workload.","title":"ignoreTerraformComponent","type":"boolean"},"parallelism":{"default":5,"description":"Maximum number of concurrent delivered components.","title":"parallelism","type":"integer"},"policies":{"description":"Declare the policies that used for this deployment. If not specified, the components will be deployed to the hub cluster.","items":{"type":"string"},"title":"policies","type":"array"}},"required":["auto","policies","parallelism","ignoreTerraformComponent"],"type":"object"}
+{
+  "properties": {
+    "auto": {
+      "default": true,
+      "description": "If set to false, the workflow will suspend automatically before this step, default to be true.",
+      "title": "auto",
+      "type": "boolean"
+    },
+    "ignoreTerraformComponent": {
+      "default": true,
+      "description": "If set false, this step will apply the components with the terraform workload.",
+      "title": "ignoreTerraformComponent",
+      "type": "boolean"
+    },
+    "parallelism": {
+      "default": 5,
+      "description": "Maximum number of concurrent delivered components.",
+      "title": "parallelism",
+      "type": "integer"
+    },
+    "policies": {
+      "description": "Declare the policies that used for this deployment. If not specified, the components will be deployed to the hub cluster.",
+      "items": {
+        "type": "string"
+      },
+      "title": "policies",
+      "type": "array"
+    }
+  },
+  "required": [
+    "auto",
+    "policies",
+    "parallelism",
+    "ignoreTerraformComponent"
+  ],
+  "type": "object"
+}

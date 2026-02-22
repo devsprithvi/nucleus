@@ -1,1 +1,75 @@
-{"properties":{"strategy":{"description":"Specify the strategy of update","properties":{"rollingStrategy":{"description":"Specify the parameters of rollong update strategy","properties":{"maxSurge":{"default":"25%","title":"maxSurge","type":"string"},"maxUnavailable":{"default":"25%","title":"maxUnavailable","type":"string"},"partition":{"default":0,"title":"partition","type":"integer"}},"required":["maxSurge","maxUnavailable","partition"],"title":"rollingStrategy","type":"object"},"type":{"default":"RollingUpdate","description":"Specify the strategy type","enum":["RollingUpdate","Recreate","OnDelete"],"title":"type","type":"string"}},"required":["type"],"title":"strategy","type":"object"},"targetAPIVersion":{"default":"apps/v1","description":"Specify the apiVersion of target","title":"targetAPIVersion","type":"string"},"targetKind":{"default":"Deployment","description":"Specify the kind of target","enum":["Deployment","StatefulSet","DaemonSet"],"title":"targetKind","type":"string"}},"required":["targetAPIVersion","targetKind","strategy"],"type":"object"}
+{
+  "properties": {
+    "strategy": {
+      "description": "Specify the strategy of update",
+      "properties": {
+        "rollingStrategy": {
+          "description": "Specify the parameters of rollong update strategy",
+          "properties": {
+            "maxSurge": {
+              "default": "25%",
+              "title": "maxSurge",
+              "type": "string"
+            },
+            "maxUnavailable": {
+              "default": "25%",
+              "title": "maxUnavailable",
+              "type": "string"
+            },
+            "partition": {
+              "default": 0,
+              "title": "partition",
+              "type": "integer"
+            }
+          },
+          "required": [
+            "maxSurge",
+            "maxUnavailable",
+            "partition"
+          ],
+          "title": "rollingStrategy",
+          "type": "object"
+        },
+        "type": {
+          "default": "RollingUpdate",
+          "description": "Specify the strategy type",
+          "enum": [
+            "RollingUpdate",
+            "Recreate",
+            "OnDelete"
+          ],
+          "title": "type",
+          "type": "string"
+        }
+      },
+      "required": [
+        "type"
+      ],
+      "title": "strategy",
+      "type": "object"
+    },
+    "targetAPIVersion": {
+      "default": "apps/v1",
+      "description": "Specify the apiVersion of target",
+      "title": "targetAPIVersion",
+      "type": "string"
+    },
+    "targetKind": {
+      "default": "Deployment",
+      "description": "Specify the kind of target",
+      "enum": [
+        "Deployment",
+        "StatefulSet",
+        "DaemonSet"
+      ],
+      "title": "targetKind",
+      "type": "string"
+    }
+  },
+  "required": [
+    "targetAPIVersion",
+    "targetKind",
+    "strategy"
+  ],
+  "type": "object"
+}

@@ -1,1 +1,84 @@
-{"properties":{"annotations":{"additionalProperties":{"type":"string"},"description":"Specify the annotations of the exposed service","title":"annotations","type":"object"},"matchLabels":{"additionalProperties":{"type":"string"},"title":"matchLabels","type":"object"},"port":{"description":"Deprecated, the old way to specify the exposion ports","items":{"type":"integer"},"title":"port","type":"array"},"ports":{"description":"Specify portsyou want customer traffic sent to","items":{"properties":{"name":{"description":"Name of the port","title":"name","type":"string"},"nodePort":{"description":"exposed node port. Only Valid when exposeType is NodePort","title":"nodePort","type":"integer"},"port":{"description":"Number of port to expose on the pod's IP address","title":"port","type":"integer"},"protocol":{"default":"TCP","description":"Protocol for port. Must be UDP, TCP, or SCTP","enum":["TCP","UDP","SCTP"],"title":"protocol","type":"string"}},"required":["port","protocol"],"type":"object"},"title":"ports","type":"array"},"type":{"default":"ClusterIP","description":"Specify what kind of Service you want. options: \"ClusterIP\",\"NodePort\",\"LoadBalancer\",\"ExternalName\"","enum":["ClusterIP","NodePort","LoadBalancer","ExternalName"],"title":"type","type":"string"}},"required":["annotations","type"],"type":"object"}
+{
+  "properties": {
+    "annotations": {
+      "additionalProperties": {
+        "type": "string"
+      },
+      "description": "Specify the annotations of the exposed service",
+      "title": "annotations",
+      "type": "object"
+    },
+    "matchLabels": {
+      "additionalProperties": {
+        "type": "string"
+      },
+      "title": "matchLabels",
+      "type": "object"
+    },
+    "port": {
+      "description": "Deprecated, the old way to specify the exposion ports",
+      "items": {
+        "type": "integer"
+      },
+      "title": "port",
+      "type": "array"
+    },
+    "ports": {
+      "description": "Specify portsyou want customer traffic sent to",
+      "items": {
+        "properties": {
+          "name": {
+            "description": "Name of the port",
+            "title": "name",
+            "type": "string"
+          },
+          "nodePort": {
+            "description": "exposed node port. Only Valid when exposeType is NodePort",
+            "title": "nodePort",
+            "type": "integer"
+          },
+          "port": {
+            "description": "Number of port to expose on the pod's IP address",
+            "title": "port",
+            "type": "integer"
+          },
+          "protocol": {
+            "default": "TCP",
+            "description": "Protocol for port. Must be UDP, TCP, or SCTP",
+            "enum": [
+              "TCP",
+              "UDP",
+              "SCTP"
+            ],
+            "title": "protocol",
+            "type": "string"
+          }
+        },
+        "required": [
+          "port",
+          "protocol"
+        ],
+        "type": "object"
+      },
+      "title": "ports",
+      "type": "array"
+    },
+    "type": {
+      "default": "ClusterIP",
+      "description": "Specify what kind of Service you want. options: \"ClusterIP\",\"NodePort\",\"LoadBalancer\",\"ExternalName\"",
+      "enum": [
+        "ClusterIP",
+        "NodePort",
+        "LoadBalancer",
+        "ExternalName"
+      ],
+      "title": "type",
+      "type": "string"
+    }
+  },
+  "required": [
+    "annotations",
+    "type"
+  ],
+  "type": "object"
+}

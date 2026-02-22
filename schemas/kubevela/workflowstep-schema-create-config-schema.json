@@ -1,1 +1,31 @@
-{"properties":{"config":{"additionalProperties":{},"description":"Specify the content of the config.","title":"config","type":"object"},"name":{"description":"Specify the name of the config.","title":"name","type":"string"},"namespace":{"description":"Specify the namespace of the config.","title":"namespace","type":"string"},"template":{"description":"Specify the template of the config.","title":"template","type":"string"}},"required":["name","namespace","config"],"type":"object"}
+{
+  "properties": {
+    "config": {
+      "additionalProperties": {},
+      "description": "Specify the content of the config.",
+      "title": "config",
+      "type": "object"
+    },
+    "name": {
+      "description": "Specify the name of the config.",
+      "title": "name",
+      "type": "string"
+    },
+    "namespace": {
+      "description": "Specify the namespace of the config.",
+      "title": "namespace",
+      "type": "string"
+    },
+    "template": {
+      "description": "Specify the template of the config.",
+      "title": "template",
+      "type": "string"
+    }
+  },
+  "required": [
+    "name",
+    "namespace",
+    "config"
+  ],
+  "type": "object"
+}

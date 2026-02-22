@@ -1,1 +1,80 @@
-{"oneOf":[{"required":["containerName","image","imagePullPolicy"]},{"required":["containers"]}],"properties":{"containerName":{"default":"","description":"Specify the name of the target container, if not set, use the component name","title":"containerName","type":"string"},"containers":{"description":"Specify the container image for multiple containers","items":{"properties":{"containerName":{"default":"","description":"Specify the name of the target container, if not set, use the component name","title":"containerName","type":"string"},"image":{"description":"Specify the image of the container","title":"image","type":"string"},"imagePullPolicy":{"default":"","description":"Specify the image pull policy of the container","enum":["","IfNotPresent","Always","Never"],"title":"imagePullPolicy","type":"string"}},"required":["containerName","image","imagePullPolicy"],"type":"object"},"title":"containers","type":"array"},"image":{"description":"Specify the image of the container","title":"image","type":"string"},"imagePullPolicy":{"default":"","description":"Specify the image pull policy of the container","enum":["","IfNotPresent","Always","Never"],"title":"imagePullPolicy","type":"string"}},"type":"object"}
+{
+  "oneOf": [
+    {
+      "required": [
+        "containerName",
+        "image",
+        "imagePullPolicy"
+      ]
+    },
+    {
+      "required": [
+        "containers"
+      ]
+    }
+  ],
+  "properties": {
+    "containerName": {
+      "default": "",
+      "description": "Specify the name of the target container, if not set, use the component name",
+      "title": "containerName",
+      "type": "string"
+    },
+    "containers": {
+      "description": "Specify the container image for multiple containers",
+      "items": {
+        "properties": {
+          "containerName": {
+            "default": "",
+            "description": "Specify the name of the target container, if not set, use the component name",
+            "title": "containerName",
+            "type": "string"
+          },
+          "image": {
+            "description": "Specify the image of the container",
+            "title": "image",
+            "type": "string"
+          },
+          "imagePullPolicy": {
+            "default": "",
+            "description": "Specify the image pull policy of the container",
+            "enum": [
+              "",
+              "IfNotPresent",
+              "Always",
+              "Never"
+            ],
+            "title": "imagePullPolicy",
+            "type": "string"
+          }
+        },
+        "required": [
+          "containerName",
+          "image",
+          "imagePullPolicy"
+        ],
+        "type": "object"
+      },
+      "title": "containers",
+      "type": "array"
+    },
+    "image": {
+      "description": "Specify the image of the container",
+      "title": "image",
+      "type": "string"
+    },
+    "imagePullPolicy": {
+      "default": "",
+      "description": "Specify the image pull policy of the container",
+      "enum": [
+        "",
+        "IfNotPresent",
+        "Always",
+        "Never"
+      ],
+      "title": "imagePullPolicy",
+      "type": "string"
+    }
+  },
+  "type": "object"
+}

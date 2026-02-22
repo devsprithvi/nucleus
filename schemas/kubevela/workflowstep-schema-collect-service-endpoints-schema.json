@@ -1,1 +1,53 @@
-{"properties":{"components":{"description":"Filter the component of the endpoints","items":{"type":"string"},"title":"components","type":"array"},"name":{"description":"Specify the name of the application","title":"name","type":"string"},"namespace":{"description":"Specify the namespace of the application","title":"namespace","type":"string"},"outer":{"description":"Filter the endpoint that are only outer","title":"outer","type":"boolean"},"port":{"description":"Filter the port of the endpoints","title":"port","type":"integer"},"portName":{"description":"Filter the port name of the endpoints","title":"portName","type":"string"},"protocal":{"default":"http","description":"The protocal of endpoint url","enum":["http","https"],"title":"protocal","type":"string"}},"required":["name","namespace","protocal"],"type":"object"}
+{
+  "properties": {
+    "components": {
+      "description": "Filter the component of the endpoints",
+      "items": {
+        "type": "string"
+      },
+      "title": "components",
+      "type": "array"
+    },
+    "name": {
+      "description": "Specify the name of the application",
+      "title": "name",
+      "type": "string"
+    },
+    "namespace": {
+      "description": "Specify the namespace of the application",
+      "title": "namespace",
+      "type": "string"
+    },
+    "outer": {
+      "description": "Filter the endpoint that are only outer",
+      "title": "outer",
+      "type": "boolean"
+    },
+    "port": {
+      "description": "Filter the port of the endpoints",
+      "title": "port",
+      "type": "integer"
+    },
+    "portName": {
+      "description": "Filter the port name of the endpoints",
+      "title": "portName",
+      "type": "string"
+    },
+    "protocal": {
+      "default": "http",
+      "description": "The protocal of endpoint url",
+      "enum": [
+        "http",
+        "https"
+      ],
+      "title": "protocal",
+      "type": "string"
+    }
+  },
+  "required": [
+    "name",
+    "namespace",
+    "protocal"
+  ],
+  "type": "object"
+}

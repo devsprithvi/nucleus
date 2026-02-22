@@ -1,1 +1,39 @@
-{"properties":{"env":{"description":"Declare the name of the env in policy","title":"env","type":"string"},"placements":{"description":"Declare the location to bind","items":{"properties":{"cluster":{"title":"cluster","type":"string"},"namespace":{"title":"namespace","type":"string"}},"type":"object"},"title":"placements","type":"array"},"policy":{"default":"","description":"Declare the name of the env-binding policy, if empty, the first env-binding policy will be used","title":"policy","type":"string"}},"required":["placements","policy","env"],"type":"object"}
+{
+  "properties": {
+    "env": {
+      "description": "Declare the name of the env in policy",
+      "title": "env",
+      "type": "string"
+    },
+    "placements": {
+      "description": "Declare the location to bind",
+      "items": {
+        "properties": {
+          "cluster": {
+            "title": "cluster",
+            "type": "string"
+          },
+          "namespace": {
+            "title": "namespace",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "title": "placements",
+      "type": "array"
+    },
+    "policy": {
+      "default": "",
+      "description": "Declare the name of the env-binding policy, if empty, the first env-binding policy will be used",
+      "title": "policy",
+      "type": "string"
+    }
+  },
+  "required": [
+    "placements",
+    "policy",
+    "env"
+  ],
+  "type": "object"
+}

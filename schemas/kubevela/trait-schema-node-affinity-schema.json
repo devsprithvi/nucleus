@@ -1,1 +1,22 @@
-{"properties":{"affinity":{"additionalProperties":{"items":{"type":"string"},"type":"array"},"title":"affinity","type":"object"},"tolerations":{"additionalProperties":{"type":"string"},"title":"tolerations","type":"object"}},"type":"object"}
+{
+  "properties": {
+    "affinity": {
+      "additionalProperties": {
+        "items": {
+          "type": "string"
+        },
+        "type": "array"
+      },
+      "title": "affinity",
+      "type": "object"
+    },
+    "tolerations": {
+      "additionalProperties": {
+        "type": "string"
+      },
+      "title": "tolerations",
+      "type": "object"
+    }
+  },
+  "type": "object"
+}

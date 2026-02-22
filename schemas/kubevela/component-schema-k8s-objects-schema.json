@@ -1,1 +1,15 @@
-{"properties":{"objects":{"items":{"type":"object"},"title":"objects","type":"array"}},"required":["objects"],"type":"object"}
+{
+  "properties": {
+    "objects": {
+      "items": {
+        "type": "object"
+      },
+      "title": "objects",
+      "type": "array"
+    }
+  },
+  "required": [
+    "objects"
+  ],
+  "type": "object"
+}

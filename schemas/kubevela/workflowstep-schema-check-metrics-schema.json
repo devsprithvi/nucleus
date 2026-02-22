@@ -1,1 +1,44 @@
-{"properties":{"condition":{"description":"Condition is an expression which determines if a measurement is considered successful. eg: \u003e=0.95","title":"condition","type":"string"},"duration":{"default":"5m","description":"Duration defines the duration of time required for this step to be considered successful.","title":"duration","type":"string"},"failDuration":{"default":"2m","description":"FailDuration is the duration of time that, if the check fails, will result in the step being marked as failed.","title":"failDuration","type":"string"},"metricEndpoint":{"description":"The HTTP address and port of the prometheus server","oneOf":[{"enum":["http://prometheus-server.o11y-system.svc:9090"]},{}],"title":"metricEndpoint","type":"string"},"query":{"description":"Query is a raw prometheus query to perform","title":"query","type":"string"}},"required":["query","condition"],"type":"object"}
+{
+  "properties": {
+    "condition": {
+      "description": "Condition is an expression which determines if a measurement is considered successful. eg: \u003e=0.95",
+      "title": "condition",
+      "type": "string"
+    },
+    "duration": {
+      "default": "5m",
+      "description": "Duration defines the duration of time required for this step to be considered successful.",
+      "title": "duration",
+      "type": "string"
+    },
+    "failDuration": {
+      "default": "2m",
+      "description": "FailDuration is the duration of time that, if the check fails, will result in the step being marked as failed.",
+      "title": "failDuration",
+      "type": "string"
+    },
+    "metricEndpoint": {
+      "description": "The HTTP address and port of the prometheus server",
+      "oneOf": [
+        {
+          "enum": [
+            "http://prometheus-server.o11y-system.svc:9090"
+          ]
+        },
+        {}
+      ],
+      "title": "metricEndpoint",
+      "type": "string"
+    },
+    "query": {
+      "description": "Query is a raw prometheus query to perform",
+      "title": "query",
+      "type": "string"
+    }
+  },
+  "required": [
+    "query",
+    "condition"
+  ],
+  "type": "object"
+}

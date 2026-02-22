@@ -1,1 +1,179 @@
-{"properties":{"accessModes":{"items":{"type":"string"},"title":"accessModes","type":"array"},"claimName":{"title":"claimName","type":"string"},"dataSource":{"properties":{"apiGroup":{"title":"apiGroup","type":"string"},"kind":{"title":"kind","type":"string"},"name":{"title":"name","type":"string"}},"required":["name","kind","apiGroup"],"title":"dataSource","type":"object"},"dataSourceRef":{"properties":{"apiGroup":{"title":"apiGroup","type":"string"},"kind":{"title":"kind","type":"string"},"name":{"title":"name","type":"string"}},"required":["name","kind","apiGroup"],"title":"dataSourceRef","type":"object"},"resources":{"properties":{"limits":{"properties":{"storage":{"pattern":"^([1-9][0-9]{0,63})(E|P|T|G|M|K|Ei|Pi|Ti|Gi|Mi|Ki)$","title":"storage","type":"string"}},"required":["storage"],"title":"limits","type":"object"},"requests":{"properties":{"storage":{"pattern":"^([1-9][0-9]{0,63})(E|P|T|G|M|K|Ei|Pi|Ti|Gi|Mi|Ki)$","title":"storage","type":"string"}},"required":["storage"],"title":"requests","type":"object"}},"required":["requests"],"title":"resources","type":"object"},"selector":{"properties":{"matchExpressions":{"properties":{"key":{"title":"key","type":"string"},"operator":{"title":"operator","type":"string"},"values":{"items":{"type":"string"},"title":"values","type":"array"}},"required":["key","values","operator"],"title":"matchExpressions","type":"object"},"matchLabels":{"additionalProperties":{"type":"string"},"title":"matchLabels","type":"object"}},"title":"selector","type":"object"},"storageClassName":{"title":"storageClassName","type":"string"},"volumeMode":{"default":"Filesystem","title":"volumeMode","type":"string"},"volumeName":{"title":"volumeName","type":"string"},"volumesToMount":{"items":{"properties":{"mountPath":{"title":"mountPath","type":"string"},"name":{"title":"name","type":"string"}},"required":["name","mountPath"],"type":"object"},"title":"volumesToMount","type":"array"}},"required":["claimName","volumeMode","accessModes","resources","volumesToMount"],"type":"object"}
+{
+  "properties": {
+    "accessModes": {
+      "items": {
+        "type": "string"
+      },
+      "title": "accessModes",
+      "type": "array"
+    },
+    "claimName": {
+      "title": "claimName",
+      "type": "string"
+    },
+    "dataSource": {
+      "properties": {
+        "apiGroup": {
+          "title": "apiGroup",
+          "type": "string"
+        },
+        "kind": {
+          "title": "kind",
+          "type": "string"
+        },
+        "name": {
+          "title": "name",
+          "type": "string"
+        }
+      },
+      "required": [
+        "name",
+        "kind",
+        "apiGroup"
+      ],
+      "title": "dataSource",
+      "type": "object"
+    },
+    "dataSourceRef": {
+      "properties": {
+        "apiGroup": {
+          "title": "apiGroup",
+          "type": "string"
+        },
+        "kind": {
+          "title": "kind",
+          "type": "string"
+        },
+        "name": {
+          "title": "name",
+          "type": "string"
+        }
+      },
+      "required": [
+        "name",
+        "kind",
+        "apiGroup"
+      ],
+      "title": "dataSourceRef",
+      "type": "object"
+    },
+    "resources": {
+      "properties": {
+        "limits": {
+          "properties": {
+            "storage": {
+              "pattern": "^([1-9][0-9]{0,63})(E|P|T|G|M|K|Ei|Pi|Ti|Gi|Mi|Ki)$",
+              "title": "storage",
+              "type": "string"
+            }
+          },
+          "required": [
+            "storage"
+          ],
+          "title": "limits",
+          "type": "object"
+        },
+        "requests": {
+          "properties": {
+            "storage": {
+              "pattern": "^([1-9][0-9]{0,63})(E|P|T|G|M|K|Ei|Pi|Ti|Gi|Mi|Ki)$",
+              "title": "storage",
+              "type": "string"
+            }
+          },
+          "required": [
+            "storage"
+          ],
+          "title": "requests",
+          "type": "object"
+        }
+      },
+      "required": [
+        "requests"
+      ],
+      "title": "resources",
+      "type": "object"
+    },
+    "selector": {
+      "properties": {
+        "matchExpressions": {
+          "properties": {
+            "key": {
+              "title": "key",
+              "type": "string"
+            },
+            "operator": {
+              "title": "operator",
+              "type": "string"
+            },
+            "values": {
+              "items": {
+                "type": "string"
+              },
+              "title": "values",
+              "type": "array"
+            }
+          },
+          "required": [
+            "key",
+            "values",
+            "operator"
+          ],
+          "title": "matchExpressions",
+          "type": "object"
+        },
+        "matchLabels": {
+          "additionalProperties": {
+            "type": "string"
+          },
+          "title": "matchLabels",
+          "type": "object"
+        }
+      },
+      "title": "selector",
+      "type": "object"
+    },
+    "storageClassName": {
+      "title": "storageClassName",
+      "type": "string"
+    },
+    "volumeMode": {
+      "default": "Filesystem",
+      "title": "volumeMode",
+      "type": "string"
+    },
+    "volumeName": {
+      "title": "volumeName",
+      "type": "string"
+    },
+    "volumesToMount": {
+      "items": {
+        "properties": {
+          "mountPath": {
+            "title": "mountPath",
+            "type": "string"
+          },
+          "name": {
+            "title": "name",
+            "type": "string"
+          }
+        },
+        "required": [
+          "name",
+          "mountPath"
+        ],
+        "type": "object"
+      },
+      "title": "volumesToMount",
+      "type": "array"
+    }
+  },
+  "required": [
+    "claimName",
+    "volumeMode",
+    "accessModes",
+    "resources",
+    "volumesToMount"
+  ],
+  "type": "object"
+}

@@ -1,1 +1,39 @@
-{"properties":{"data":{"description":"Specify the data to export","title":"data","type":"object"},"kind":{"default":"ConfigMap","description":"Specify the kind of the export destination","enum":["ConfigMap","Secret"],"title":"kind","type":"string"},"name":{"description":"Specify the name of the export destination","title":"name","type":"string"},"namespace":{"description":"Specify the namespace of the export destination","title":"namespace","type":"string"},"topology":{"description":"Specify the topology to export","title":"topology","type":"string"}},"required":["kind","data"],"type":"object"}
+{
+  "properties": {
+    "data": {
+      "description": "Specify the data to export",
+      "title": "data",
+      "type": "object"
+    },
+    "kind": {
+      "default": "ConfigMap",
+      "description": "Specify the kind of the export destination",
+      "enum": [
+        "ConfigMap",
+        "Secret"
+      ],
+      "title": "kind",
+      "type": "string"
+    },
+    "name": {
+      "description": "Specify the name of the export destination",
+      "title": "name",
+      "type": "string"
+    },
+    "namespace": {
+      "description": "Specify the namespace of the export destination",
+      "title": "namespace",
+      "type": "string"
+    },
+    "topology": {
+      "description": "Specify the topology to export",
+      "title": "topology",
+      "type": "string"
+    }
+  },
+  "required": [
+    "kind",
+    "data"
+  ],
+  "type": "object"
+}

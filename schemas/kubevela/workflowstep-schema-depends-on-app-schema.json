@@ -1,1 +1,19 @@
-{"properties":{"name":{"description":"Specify the name of the dependent Application","title":"name","type":"string"},"namespace":{"description":"Specify the namespace of the dependent Application","title":"namespace","type":"string"}},"required":["name","namespace"],"type":"object"}
+{
+  "properties": {
+    "name": {
+      "description": "Specify the name of the dependent Application",
+      "title": "name",
+      "type": "string"
+    },
+    "namespace": {
+      "description": "Specify the namespace of the dependent Application",
+      "title": "namespace",
+      "type": "string"
+    }
+  },
+  "required": [
+    "name",
+    "namespace"
+  ],
+  "type": "object"
+}

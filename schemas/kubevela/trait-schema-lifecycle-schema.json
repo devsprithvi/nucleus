@@ -1,1 +1,195 @@
-{"properties":{"postStart":{"properties":{"exec":{"properties":{"command":{"items":{"type":"string"},"title":"command","type":"array"}},"required":["command"],"title":"exec","type":"object"},"httpGet":{"properties":{"host":{"title":"host","type":"string"},"httpHeaders":{"items":{"properties":{"name":{"title":"name","type":"string"},"value":{"title":"value","type":"string"}},"required":["name","value"],"type":"object"},"title":"httpHeaders","type":"array"},"path":{"title":"path","type":"string"},"port":{"maximum":65535,"minimum":1,"title":"port","type":"integer"},"scheme":{"default":"HTTP","enum":["HTTP","HTTPS"],"title":"scheme","type":"string"}},"required":["port","scheme"],"title":"httpGet","type":"object"},"tcpSocket":{"properties":{"host":{"title":"host","type":"string"},"port":{"maximum":65535,"minimum":1,"title":"port","type":"integer"}},"required":["port"],"title":"tcpSocket","type":"object"}},"title":"postStart","type":"object"},"preStop":{"properties":{"exec":{"properties":{"command":{"items":{"type":"string"},"title":"command","type":"array"}},"required":["command"],"title":"exec","type":"object"},"httpGet":{"properties":{"host":{"title":"host","type":"string"},"httpHeaders":{"items":{"properties":{"name":{"title":"name","type":"string"},"value":{"title":"value","type":"string"}},"required":["name","value"],"type":"object"},"title":"httpHeaders","type":"array"},"path":{"title":"path","type":"string"},"port":{"maximum":65535,"minimum":1,"title":"port","type":"integer"},"scheme":{"default":"HTTP","enum":["HTTP","HTTPS"],"title":"scheme","type":"string"}},"required":["port","scheme"],"title":"httpGet","type":"object"},"tcpSocket":{"properties":{"host":{"title":"host","type":"string"},"port":{"maximum":65535,"minimum":1,"title":"port","type":"integer"}},"required":["port"],"title":"tcpSocket","type":"object"}},"title":"preStop","type":"object"}},"type":"object"}
+{
+  "properties": {
+    "postStart": {
+      "properties": {
+        "exec": {
+          "properties": {
+            "command": {
+              "items": {
+                "type": "string"
+              },
+              "title": "command",
+              "type": "array"
+            }
+          },
+          "required": [
+            "command"
+          ],
+          "title": "exec",
+          "type": "object"
+        },
+        "httpGet": {
+          "properties": {
+            "host": {
+              "title": "host",
+              "type": "string"
+            },
+            "httpHeaders": {
+              "items": {
+                "properties": {
+                  "name": {
+                    "title": "name",
+                    "type": "string"
+                  },
+                  "value": {
+                    "title": "value",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "name",
+                  "value"
+                ],
+                "type": "object"
+              },
+              "title": "httpHeaders",
+              "type": "array"
+            },
+            "path": {
+              "title": "path",
+              "type": "string"
+            },
+            "port": {
+              "maximum": 65535,
+              "minimum": 1,
+              "title": "port",
+              "type": "integer"
+            },
+            "scheme": {
+              "default": "HTTP",
+              "enum": [
+                "HTTP",
+                "HTTPS"
+              ],
+              "title": "scheme",
+              "type": "string"
+            }
+          },
+          "required": [
+            "port",
+            "scheme"
+          ],
+          "title": "httpGet",
+          "type": "object"
+        },
+        "tcpSocket": {
+          "properties": {
+            "host": {
+              "title": "host",
+              "type": "string"
+            },
+            "port": {
+              "maximum": 65535,
+              "minimum": 1,
+              "title": "port",
+              "type": "integer"
+            }
+          },
+          "required": [
+            "port"
+          ],
+          "title": "tcpSocket",
+          "type": "object"
+        }
+      },
+      "title": "postStart",
+      "type": "object"
+    },
+    "preStop": {
+      "properties": {
+        "exec": {
+          "properties": {
+            "command": {
+              "items": {
+                "type": "string"
+              },
+              "title": "command",
+              "type": "array"
+            }
+          },
+          "required": [
+            "command"
+          ],
+          "title": "exec",
+          "type": "object"
+        },
+        "httpGet": {
+          "properties": {
+            "host": {
+              "title": "host",
+              "type": "string"
+            },
+            "httpHeaders": {
+              "items": {
+                "properties": {
+                  "name": {
+                    "title": "name",
+                    "type": "string"
+                  },
+                  "value": {
+                    "title": "value",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "name",
+                  "value"
+                ],
+                "type": "object"
+              },
+              "title": "httpHeaders",
+              "type": "array"
+            },
+            "path": {
+              "title": "path",
+              "type": "string"
+            },
+            "port": {
+              "maximum": 65535,
+              "minimum": 1,
+              "title": "port",
+              "type": "integer"
+            },
+            "scheme": {
+              "default": "HTTP",
+              "enum": [
+                "HTTP",
+                "HTTPS"
+              ],
+              "title": "scheme",
+              "type": "string"
+            }
+          },
+          "required": [
+            "port",
+            "scheme"
+          ],
+          "title": "httpGet",
+          "type": "object"
+        },
+        "tcpSocket": {
+          "properties": {
+            "host": {
+              "title": "host",
+              "type": "string"
+            },
+            "port": {
+              "maximum": 65535,
+              "minimum": 1,
+              "title": "port",
+              "type": "integer"
+            }
+          },
+          "required": [
+            "port"
+          ],
+          "title": "tcpSocket",
+          "type": "object"
+        }
+      },
+      "title": "preStop",
+      "type": "object"
+    }
+  },
+  "type": "object"
+}

@@ -1,1 +1,83 @@
-{"properties":{"annotations":{"additionalProperties":{"type":"string"},"description":"Specify the annotations to be added to the ingress","title":"annotations","type":"object"},"class":{"default":"nginx","description":"Specify the class of ingress to use","title":"class","type":"string"},"classInSpec":{"default":false,"description":"Set ingress class in '.spec.ingressClassName' instead of 'kubernetes.io/ingress.class' annotation.","title":"classInSpec","type":"boolean"},"domain":{"description":"Specify the domain you want to expose","title":"domain","type":"string"},"existingServiceName":{"description":"If specified, use an existing Service rather than creating one","title":"existingServiceName","type":"string"},"gatewayHost":{"description":"Specify the host of the ingress gateway, which is used to generate the endpoints when the host is empty.","title":"gatewayHost","type":"string"},"http":{"additionalProperties":{"type":"integer"},"description":"Specify the mapping relationship between the http path and the workload port","title":"http","type":"object"},"labels":{"additionalProperties":{"type":"string"},"description":"Specify the labels to be added to the ingress","title":"labels","type":"object"},"name":{"description":"Specify a unique name for this gateway, required to support multiple gateway traits on a component","title":"name","type":"string"},"pathType":{"default":"ImplementationSpecific","description":"Specify a pathType for the ingress rules, defaults to \"ImplementationSpecific\"","enum":["ImplementationSpecific","Prefix","Exact"],"title":"pathType","type":"string"},"secretName":{"description":"Specify the secret name you want to quote to use tls.","title":"secretName","type":"string"}},"required":["http","class","classInSpec","pathType"],"type":"object"}
+{
+  "properties": {
+    "annotations": {
+      "additionalProperties": {
+        "type": "string"
+      },
+      "description": "Specify the annotations to be added to the ingress",
+      "title": "annotations",
+      "type": "object"
+    },
+    "class": {
+      "default": "nginx",
+      "description": "Specify the class of ingress to use",
+      "title": "class",
+      "type": "string"
+    },
+    "classInSpec": {
+      "default": false,
+      "description": "Set ingress class in '.spec.ingressClassName' instead of 'kubernetes.io/ingress.class' annotation.",
+      "title": "classInSpec",
+      "type": "boolean"
+    },
+    "domain": {
+      "description": "Specify the domain you want to expose",
+      "title": "domain",
+      "type": "string"
+    },
+    "existingServiceName": {
+      "description": "If specified, use an existing Service rather than creating one",
+      "title": "existingServiceName",
+      "type": "string"
+    },
+    "gatewayHost": {
+      "description": "Specify the host of the ingress gateway, which is used to generate the endpoints when the host is empty.",
+      "title": "gatewayHost",
+      "type": "string"
+    },
+    "http": {
+      "additionalProperties": {
+        "type": "integer"
+      },
+      "description": "Specify the mapping relationship between the http path and the workload port",
+      "title": "http",
+      "type": "object"
+    },
+    "labels": {
+      "additionalProperties": {
+        "type": "string"
+      },
+      "description": "Specify the labels to be added to the ingress",
+      "title": "labels",
+      "type": "object"
+    },
+    "name": {
+      "description": "Specify a unique name for this gateway, required to support multiple gateway traits on a component",
+      "title": "name",
+      "type": "string"
+    },
+    "pathType": {
+      "default": "ImplementationSpecific",
+      "description": "Specify a pathType for the ingress rules, defaults to \"ImplementationSpecific\"",
+      "enum": [
+        "ImplementationSpecific",
+        "Prefix",
+        "Exact"
+      ],
+      "title": "pathType",
+      "type": "string"
+    },
+    "secretName": {
+      "description": "Specify the secret name you want to quote to use tls.",
+      "title": "secretName",
+      "type": "string"
+    }
+  },
+  "required": [
+    "http",
+    "class",
+    "classInSpec",
+    "pathType"
+  ],
+  "type": "object"
+}
