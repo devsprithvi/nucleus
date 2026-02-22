@@ -85,18 +85,46 @@ func (a *Actions) GenerateVelaSchemas(
 		return nil, fmt.Errorf("phase 5 (build master schema) failed: %w", err)
 	}
 
+	// Helper to enforce the "kind" field in the raw definition schemas
+	// so VS Code's 'anyOf' root discriminator knows which schema branch to take
+	enforceKind := func(raw []byte, expectedKind string) []byte {
+		if raw == nil || string(raw) == "null" {
+			return raw
+		}
+		var parsed map[string]interface{}
+		if err := json.Unmarshal(raw, &parsed); err == nil {
+			if propsObj := dig(parsed, "properties"); propsObj != nil {
+				if propsMap, ok := propsObj.(map[string]interface{}); ok {
+					if kindObj, exists := propsMap["kind"]; exists {
+						if kindMap, isMap := kindObj.(map[string]interface{}); isMap {
+							kindMap["enum"] = []string{expectedKind}
+						}
+					}
+				}
+			}
+			if b, err := json.Marshal(parsed); err == nil {
+				return b
+			}
+		}
+		return raw
+	}
+
 	// Phase 6: Write the definition CRD schemas and generate the Grandparent schema
 	if len(payload.CompDefSchema) > 0 && string(payload.CompDefSchema) != "null" {
-		schemaDir = schemaDir.WithNewFile("vela-componentdefinition-schema.json", cleanJSONBlob(payload.CompDefSchema))
+		cleaned := cleanJSONBlob(enforceKind(payload.CompDefSchema, "ComponentDefinition"))
+		schemaDir = schemaDir.WithNewFile("vela-componentdefinition-schema.json", cleaned)
 	}
 	if len(payload.TraitDefSchema) > 0 && string(payload.TraitDefSchema) != "null" {
-		schemaDir = schemaDir.WithNewFile("vela-traitdefinition-schema.json", cleanJSONBlob(payload.TraitDefSchema))
+		cleaned := cleanJSONBlob(enforceKind(payload.TraitDefSchema, "TraitDefinition"))
+		schemaDir = schemaDir.WithNewFile("vela-traitdefinition-schema.json", cleaned)
 	}
 	if len(payload.PolicyDefSchema) > 0 && string(payload.PolicyDefSchema) != "null" {
-		schemaDir = schemaDir.WithNewFile("vela-policydefinition-schema.json", cleanJSONBlob(payload.PolicyDefSchema))
+		cleaned := cleanJSONBlob(enforceKind(payload.PolicyDefSchema, "PolicyDefinition"))
+		schemaDir = schemaDir.WithNewFile("vela-policydefinition-schema.json", cleaned)
 	}
 	if len(payload.WorkflowStepDefSchema) > 0 && string(payload.WorkflowStepDefSchema) != "null" {
-		schemaDir = schemaDir.WithNewFile("vela-workflowstepdefinition-schema.json", cleanJSONBlob(payload.WorkflowStepDefSchema))
+		cleaned := cleanJSONBlob(enforceKind(payload.WorkflowStepDefSchema, "WorkflowStepDefinition"))
+		schemaDir = schemaDir.WithNewFile("vela-workflowstepdefinition-schema.json", cleaned)
 	}
 
 	grandparent := `{
@@ -479,6 +507,18 @@ func buildMasterSchema(dir *dagger.Directory, crdJSON []byte, entries []schemaEn
 
 	// Add the JSON Schema dialect marker so VS Code recognises the format
 	schema["$schema"] = "http://json-schema.org/draft-07/schema#"
+
+	// Enforce the kind discriminator for the Application schema
+	// (so VS Code's grandparent anyOf logic knows to take this branch)
+	if propsObj := dig(schema, "properties"); propsObj != nil {
+		if propsMap, ok := propsObj.(map[string]interface{}); ok {
+			if kindObj, exists := propsMap["kind"]; exists {
+				if kindMap, isMap := kindObj.(map[string]interface{}); isMap {
+					kindMap["enum"] = []string{"Application"}
+				}
+			}
+		}
+	}
 
 	out, err := json.MarshalIndent(schema, "", "  ")
 	if err != nil {
