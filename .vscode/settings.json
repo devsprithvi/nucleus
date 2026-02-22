@@ -78,10 +78,11 @@
   // Regenerate schemas anytime:
   //   GitHub Actions → "Generate KubeVela Schemas" → Run workflow
   //
-  // yaml.schemas values MUST be a string (VS Code validator does not accept arrays).
-  // Use a broad glob — all *.yaml under apps/ are KubeVela Application files.
+  // We point both apps and infrastructure to a single 'grandparent' schema
+  // that uses a 'oneOf' pattern to intelligently switch between applications,
+  // component definitions, and trait definitions based on the 'kind' field.
   "yaml.schemas": {
-    "./schemas/kubevela/vela-application-schema.json": "apps/**/*.yaml"
+    "./schemas/kubevela/vela-grandparent-schema.json": "{apps,infrastructure}/**/*.yaml"
   },
 
   /* * =========================================================================

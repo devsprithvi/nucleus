@@ -100,7 +100,7 @@ func (a *Actions) GenerateVelaSchemas(
 
 	grandparent := `{
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "oneOf": [
+  "anyOf": [
     { "$ref": "vela-application-schema.json" },
     { "$ref": "vela-componentdefinition-schema.json" },
     { "$ref": "vela-traitdefinition-schema.json" },
