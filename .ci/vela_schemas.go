@@ -30,6 +30,11 @@ type ClusterPayload struct {
 	// Stored as json.RawMessage because bash inlines it as a JSON object (not a string).
 	CRDSchema json.RawMessage `json:"crd_schema"`
 
+	CompDefSchema         json.RawMessage `json:"comp_def_schema"`
+	TraitDefSchema        json.RawMessage `json:"trait_def_schema"`
+	PolicyDefSchema       json.RawMessage `json:"policy_def_schema"`
+	WorkflowStepDefSchema json.RawMessage `json:"workflow_step_def_schema"`
+
 	// ConfigMaps is the raw JSON list object of per-type property schemas.
 	// Stored as json.RawMessage for the same reason.
 	ConfigMaps json.RawMessage `json:"config_maps"`
@@ -78,6 +83,32 @@ func (a *Actions) GenerateVelaSchemas(
 	if err != nil {
 		return nil, fmt.Errorf("phase 5 (build master schema) failed: %w", err)
 	}
+
+	// Phase 6: Write the definition CRD schemas and generate the Grandparent schema
+	if len(payload.CompDefSchema) > 0 && string(payload.CompDefSchema) != "null" {
+		schemaDir = schemaDir.WithNewFile("vela-componentdefinition-schema.json", string(payload.CompDefSchema))
+	}
+	if len(payload.TraitDefSchema) > 0 && string(payload.TraitDefSchema) != "null" {
+		schemaDir = schemaDir.WithNewFile("vela-traitdefinition-schema.json", string(payload.TraitDefSchema))
+	}
+	if len(payload.PolicyDefSchema) > 0 && string(payload.PolicyDefSchema) != "null" {
+		schemaDir = schemaDir.WithNewFile("vela-policydefinition-schema.json", string(payload.PolicyDefSchema))
+	}
+	if len(payload.WorkflowStepDefSchema) > 0 && string(payload.WorkflowStepDefSchema) != "null" {
+		schemaDir = schemaDir.WithNewFile("vela-workflowstepdefinition-schema.json", string(payload.WorkflowStepDefSchema))
+	}
+
+	grandparent := `{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "oneOf": [
+    { "$ref": "vela-application-schema.json" },
+    { "$ref": "vela-componentdefinition-schema.json" },
+    { "$ref": "vela-traitdefinition-schema.json" },
+    { "$ref": "vela-policydefinition-schema.json" },
+    { "$ref": "vela-workflowstepdefinition-schema.json" }
+  ]
+}`
+	schemaDir = schemaDir.WithNewFile("vela-grandparent-schema.json", grandparent)
 
 	return schemaDir, nil
 }
@@ -194,9 +225,9 @@ func executeVPNAndFetch(
 			sleep 10
 		done
 
-		# ── PHASE 7: Fetch BOTH data sources ──────────────────────────────────────
+		# ── PHASE 7: Fetch ALL data sources ──────────────────────────────────────
 		echo "" >&2
-		echo "━━━ PHASE 7: Fetching Application CRD schema + ConfigMaps ━━━" >&2
+		echo "━━━ PHASE 7: Fetching Application and Definition CRDs + ConfigMaps ━━━" >&2
 
 		# Source 1: The Application CRD — provides the FULL outer schema
 		# (components[].name, type, traits, dependsOn, policies, workflow — everything)
@@ -212,15 +243,23 @@ func executeVPNAndFetch(
 		if [ -z "$CRD_JSON" ]; then
 			die "Could not fetch Application CRD schema from cluster"
 		fi
-		echo "  ✅ CRD schema fetched ($(echo "$CRD_JSON" | wc -c) bytes)" >&2
+		echo "  ✅ Application CRD schema fetched ($(echo "$CRD_JSON" | wc -c) bytes)" >&2
 
-		# Source 2: Per-type property detail schemas from ConfigMaps
+		# Source 2: The Definition CRDs (Component, Trait, Policy, WorkflowStep)
+		echo "  Fetching Definition CRD schemas..." >&2
+		COMP_DEF_JSON=$(kubectl get crd componentdefinitions.core.oam.dev -o jsonpath='{.spec.versions[?(@.name=="v1beta1")].schema.openAPIV3Schema}' 2>/dev/null || kubectl get crd componentdefinitions.core.oam.dev -o jsonpath='{.spec.versions[0].schema.openAPIV3Schema}' 2>/dev/null || echo "null")
+		TRAIT_DEF_JSON=$(kubectl get crd traitdefinitions.core.oam.dev -o jsonpath='{.spec.versions[?(@.name=="v1beta1")].schema.openAPIV3Schema}' 2>/dev/null || kubectl get crd traitdefinitions.core.oam.dev -o jsonpath='{.spec.versions[0].schema.openAPIV3Schema}' 2>/dev/null || echo "null")
+		POLICY_DEF_JSON=$(kubectl get crd policydefinitions.core.oam.dev -o jsonpath='{.spec.versions[?(@.name=="v1beta1")].schema.openAPIV3Schema}' 2>/dev/null || kubectl get crd policydefinitions.core.oam.dev -o jsonpath='{.spec.versions[0].schema.openAPIV3Schema}' 2>/dev/null || echo "null")
+		WORKFLOW_STEP_DEF_JSON=$(kubectl get crd workflowstepdefinitions.core.oam.dev -o jsonpath='{.spec.versions[?(@.name=="v1beta1")].schema.openAPIV3Schema}' 2>/dev/null || kubectl get crd workflowstepdefinitions.core.oam.dev -o jsonpath='{.spec.versions[0].schema.openAPIV3Schema}' 2>/dev/null || echo "null")
+		echo "  ✅ Definition CRD schemas fetched" >&2
+
+		# Source 3: Per-type property detail schemas from ConfigMaps
 		echo "  Fetching KubeVela property ConfigMaps..." >&2
 		CM_JSON=$(kubectl get configmap -n vela-system -l definition.oam.dev=schema -o json)
 		echo "  ✅ ConfigMaps fetched" >&2
 
-		# Emit a single JSON envelope so Go gets both in one stdout read
-		printf '{"crd_schema":%s,"config_maps":%s}' "$CRD_JSON" "$CM_JSON"
+		# Emit a single JSON envelope so Go gets everything in one stdout read
+		printf '{"crd_schema":%s,"config_maps":%s,"comp_def_schema":%s,"trait_def_schema":%s,"policy_def_schema":%s,"workflow_step_def_schema":%s}' "$CRD_JSON" "$CM_JSON" "${COMP_DEF_JSON:-null}" "${TRAIT_DEF_JSON:-null}" "${POLICY_DEF_JSON:-null}" "${WORKFLOW_STEP_DEF_JSON:-null}"
 	`
 
 	return container.
