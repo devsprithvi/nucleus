@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"reflect"
 	"strings"
 
 	"dagger/nucleus-ci/internal/dagger"
@@ -86,16 +87,16 @@ func (a *Actions) GenerateVelaSchemas(
 
 	// Phase 6: Write the definition CRD schemas and generate the Grandparent schema
 	if len(payload.CompDefSchema) > 0 && string(payload.CompDefSchema) != "null" {
-		schemaDir = schemaDir.WithNewFile("vela-componentdefinition-schema.json", string(payload.CompDefSchema))
+		schemaDir = schemaDir.WithNewFile("vela-componentdefinition-schema.json", cleanJSONBlob(payload.CompDefSchema))
 	}
 	if len(payload.TraitDefSchema) > 0 && string(payload.TraitDefSchema) != "null" {
-		schemaDir = schemaDir.WithNewFile("vela-traitdefinition-schema.json", string(payload.TraitDefSchema))
+		schemaDir = schemaDir.WithNewFile("vela-traitdefinition-schema.json", cleanJSONBlob(payload.TraitDefSchema))
 	}
 	if len(payload.PolicyDefSchema) > 0 && string(payload.PolicyDefSchema) != "null" {
-		schemaDir = schemaDir.WithNewFile("vela-policydefinition-schema.json", string(payload.PolicyDefSchema))
+		schemaDir = schemaDir.WithNewFile("vela-policydefinition-schema.json", cleanJSONBlob(payload.PolicyDefSchema))
 	}
 	if len(payload.WorkflowStepDefSchema) > 0 && string(payload.WorkflowStepDefSchema) != "null" {
-		schemaDir = schemaDir.WithNewFile("vela-workflowstepdefinition-schema.json", string(payload.WorkflowStepDefSchema))
+		schemaDir = schemaDir.WithNewFile("vela-workflowstepdefinition-schema.json", cleanJSONBlob(payload.WorkflowStepDefSchema))
 	}
 
 	grandparent := `{
@@ -333,6 +334,9 @@ func writeIndividualSchemas(dir *dagger.Directory, list SchemaMapList) (*dagger.
 		if !ok || schemaContent == "" {
 			continue
 		}
+
+		schemaContent = cleanJSONBlob([]byte(schemaContent))
+
 		typeName, category := parseEntry(item.Metadata.Name)
 		if typeName == "" {
 			continue
@@ -395,6 +399,8 @@ func buildMasterSchema(dir *dagger.Directory, crdJSON []byte, entries []schemaEn
 	if err := json.Unmarshal(crdJSON, &schema); err != nil {
 		return nil, fmt.Errorf("parse CRD schema: %w", err)
 	}
+
+	cleanSchema(schema)
 
 	// Bucket entries by category
 	var compEntries, traitEntries, policyEntries, wfEntries []schemaEntry
@@ -513,4 +519,51 @@ func injectConditionals(schemaObj interface{}, rules []map[string]interface{}) {
 		merged = append(merged, r)
 	}
 	m["allOf"] = merged
+}
+
+// ── Cleanup tool ─────────────────────────────────────────────────────────────
+
+// cleanJSONBlob unmarshals, cleans, and marshals a JSON schema payload
+func cleanJSONBlob(raw []byte) string {
+	var parsed map[string]interface{}
+	if err := json.Unmarshal(raw, &parsed); err == nil {
+		cleanSchema(parsed)
+		if cleaned, err := json.MarshalIndent(parsed, "", "  "); err == nil {
+			return string(cleaned)
+		}
+	}
+	return string(raw) // fallback
+}
+
+// cleanSchema recursively scrub KubeVela's generated JSON schema to fix Draft-07 compliance.
+// Currently fixes duplicate entries in "enum" fields (e.g. ["", "Memory", "Memory"]).
+func cleanSchema(m map[string]interface{}) {
+	for k, v := range m {
+		if k == "enum" {
+			if arr, ok := v.([]interface{}); ok {
+				var unique []interface{}
+				for _, val := range arr {
+					found := false
+					for _, existing := range unique {
+						if reflect.DeepEqual(existing, val) {
+							found = true
+							break
+						}
+					}
+					if !found {
+						unique = append(unique, val)
+					}
+				}
+				m[k] = unique
+			}
+		} else if sub, ok := v.(map[string]interface{}); ok {
+			cleanSchema(sub)
+		} else if arr, ok := v.([]interface{}); ok {
+			for _, item := range arr {
+				if subItem, ok := item.(map[string]interface{}); ok {
+					cleanSchema(subItem)
+				}
+			}
+		}
+	}
 }
