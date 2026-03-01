@@ -1,7 +1,0 @@
-{
-  "name": "nucleus-ci",
-  "engineVersion": "v0.19.11",
-  "sdk": {
-    "source": "go"
-  }
-}

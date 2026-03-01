@@ -1,1 +1,0 @@
-{"properties":{"hostAliases":{"description":"Specify the hostAliases to add","items":{"properties":{"hostnames":{"items":{"type":"string"},"title":"hostnames","type":"array"},"ip":{"title":"ip","type":"string"}},"required":["ip","hostnames"],"type":"object"},"title":"hostAliases","type":"array"}},"required":["hostAliases"],"type":"object"}

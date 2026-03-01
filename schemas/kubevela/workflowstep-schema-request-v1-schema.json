@@ -1,1 +1,0 @@
-{"properties":{"body":{"additionalProperties":{},"title":"body","type":"object"},"header":{"additionalProperties":{"type":"string"},"title":"header","type":"object"},"method":{"default":"GET","enum":["GET","POST","PUT","DELETE"],"title":"method","type":"string"},"url":{"title":"url","type":"string"}},"required":["url","method"],"type":"object"}

@@ -1,1 +1,0 @@
-{"properties":{"replicas":{"default":1,"description":"Specify the number of workload","title":"replicas","type":"integer"}},"required":["replicas"],"type":"object"}

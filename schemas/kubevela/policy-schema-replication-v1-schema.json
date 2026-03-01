@@ -1,1 +1,0 @@
-{"properties":{"keys":{"description":"Spicify the keys of replication. Every key coresponds to a replication components","items":{"type":"string"},"title":"keys","type":"array"},"selector":{"description":"Specify the components which will be replicated.","items":{"type":"string"},"title":"selector","type":"array"}},"required":["keys"],"type":"object"}

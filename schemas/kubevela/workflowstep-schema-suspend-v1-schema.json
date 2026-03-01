@@ -1,1 +1,0 @@
-{"properties":{"duration":{"description":"Specify the wait duration time to resume workflow such as \"30s\", \"1min\" or \"2m15s\"","title":"duration","type":"string"},"message":{"description":"The suspend message to show","title":"message","type":"string"}},"type":"object"}

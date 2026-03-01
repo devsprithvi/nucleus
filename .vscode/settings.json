@@ -124,5 +124,7 @@
     "**/.git/objects/**": true,
     "**/dist/**": true,
     "**/build/**": true
-  }
+  },
+  "doppler.autocomplete.enable": true,
+  "doppler.hover.enable": true
 }

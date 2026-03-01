@@ -1,7 +1,0 @@
-{
-  "additionalProperties": {
-    "nullable": true,
-    "type": "string"
-  },
-  "type": "object"
-}

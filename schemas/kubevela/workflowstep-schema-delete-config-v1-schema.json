@@ -1,1 +1,0 @@
-{"properties":{"name":{"description":"Specify the name of the config.","title":"name","type":"string"},"namespace":{"description":"Specify the namespace of the config.","title":"namespace","type":"string"}},"required":["name","namespace"],"type":"object"}

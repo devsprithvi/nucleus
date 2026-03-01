@@ -1,1 +1,0 @@
-{"properties":{"exceptions":{"description":"Declare the name of the component","items":{"type":"string"},"title":"exceptions","type":"array"}},"type":"object"}

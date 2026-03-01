@@ -1,4 +1,8 @@
-# Repository TODOs
+# TODO List
 
-- [ ] **CI/CD Schema Extraction Pipeline:** Build an automated pipeline that runs against the active KubeVela cluster, extracts the dynamic JSON schemas (e.g., `webservice`, `worker`), and automatically commits/pushes them into the `schemas/kubevela/` folder in this repository.
-- [ ] **Configure Dependent Repositories:** Update the `.vscode/settings.json` in other repositories to target the raw `githubusercontent.com` URLs of these centralized schemas to enable auto-completion seamlessly without local clusters.
+## Infrastructure & Tooling Upgrades
+
+- [ ] **Scaffolding Tool Integration**: Set up the `scaffold` tool (https://github.com/hay-kot/scaffold) in our repository. We will create and utilize a dedicated `scaffold` folder for managing our project templates.
+- [ ] **Build System**: Utilize the **Buck2** build tool by Meta (Facebook) for building our projects.
+- [ ] **Repository Architecture**: Upgrade to a **Git submodules architecture** to make the repository more powerful and cleaner.
+- [ ] **Configuration**: Create the System Configurations using the **Rust** programming language.

@@ -1,0 +1,18 @@
+# ============================================================
+# TEST FILE: Verify KubeVela V2 Schema Auto-Completion
+# ============================================================
+# Instructions:
+#   1. Place cursor after "type:" and press Ctrl+Space
+#   2. You should see: webservice, worker, daemon, task, cron-task, etc.
+#   3. Place cursor under "properties:" and press Ctrl+Space
+#   4. You should see context-specific properties for the chosen type
+#   5. Try changing "type: webservice" to "type: worker" and check properties change
+#   6. Delete this file after testing
+# ============================================================
+
+apiVersion: core.oam.dev/v1beta1
+kind: Application
+spec:
+  components:
+    - name: test
+      type: 

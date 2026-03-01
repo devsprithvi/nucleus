@@ -1,0 +1,18 @@
+apiVersion: core.oam.dev/v1beta1
+kind: ComponentDefinition
+metadata:
+  name: aws-s3-bucket
+  namespace: vela-system
+  annotations:
+    definition.oam.dev/description: "Terraform module for AWS S3"
+spec:
+  workload:
+    definition:
+      apiVersion: terraform.core.oam.dev/v1beta1
+      kind: Configuration
+  schematic:
+    terraform:
+      provider: aws
+      # Pointing to the official community AWS S3 bucket terraform module repository
+      configuration: "https://github.com/terraform-aws-modules/terraform-aws-s3-bucket.git"
+      
